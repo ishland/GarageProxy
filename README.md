@@ -7,8 +7,6 @@ Forwards anything from LAN.
 - POSIX and PCNTL extensions for PHP
 
 ### Installation
-- Upload core files and [Workerman](https://github.com/walkor/workerman) to your server.
-- If on windows, do `php FileName.php`
-- If on Linux, do `php FileName.php start [-d]`
+- Run `php build.php`
 - It will create a configuration file, edit it.
 - Start it again and enjoy.
