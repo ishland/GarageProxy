@@ -7,6 +7,8 @@ Forwards anything from LAN.
 - POSIX and PCNTL extensions for PHP
 
 ### Installation
+- Download all the files to your server.
 - Run `php build.php`
-- It will create a configuration file, edit it.
-- Start it again and enjoy.
+- Change current dir to `./build`
+- Run `php GarageProxy.phar`
+- Enjoy.
