@@ -6,9 +6,14 @@ Forwards anything from LAN.
 - A POSIX compatible operating system (Linux, OSX, BSD)
 - POSIX and PCNTL extensions for PHP
 
-### Installation
+### Installation (Pack them and run)
 - Download all the files to your server.
 - Run `php build.php`
 - Change current dir to `./build`
 - Run `php GarageProxy.phar start [-d]`
+- Enjoy.
+
+### Installation (Only run)
+- Download all the files to your server.
+- Run `php start.php start [-d]`
 - Enjoy.
