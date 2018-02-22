@@ -9,7 +9,6 @@ Forwards anything from LAN.
 ### Installation (Pack them and run)
 - Download all the files to your server.
 - Run `php build.php`
-- Change current dir to `./build`
 - Run `php GarageProxy.phar start [-d]`
 - Enjoy.
 
