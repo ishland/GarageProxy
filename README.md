@@ -13,7 +13,3 @@ Forwards anything from LAN.
 - Run `php GarageProxy.phar start [-d]`
 - Enjoy.
 
-### Installation (Only run)
-- Download all the files to your server.
-- Run `php start.php start [-d]`
-- Enjoy.
