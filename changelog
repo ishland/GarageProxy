@@ -1,3 +1,8 @@
+v0.1-dev.2 Updates
+- Built-in workerman
+- Only run mode
++ Use bug-fixed workerman
+* Fixed when start in daemon mode, it can not stop
 v0.1-dev.1 Updates
 + Phar support.
 v0.1-dev.0 Updates (unavailable)

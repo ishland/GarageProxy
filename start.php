@@ -5,6 +5,10 @@ echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing Workerman...\
 use Workerman\Worker;
 use Workerman\Connection\AsyncTcpConnection;
 require_once __DIR__ . '/Autoloader.php';
+if(!is_dir("./logs")) mkdir("./logs");
+Worker::$stdoutFile = './logs/latest.log';
+Worker::$pidFile = './.pid';
+Worker::$logFile = './logs/workerman.log';
 $workerid = 0;
 
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializtion of Workerman has completed.\r\n";
@@ -15,7 +19,7 @@ function loadConfig()
 {
     if (! file_exists("./config.php")) {
         echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\r\n";
-        file_put_contents("./config.php", "<?php\n//This is the configration of GarageProxy-NoProtocol.\n//Config format: setWorker(string \$lisening, string\$remote-server, int \$worker-count)\n//\$listening and \$remote-server: [Protocol]://[Address]:[Port]\n//Example: setWorker(\"tcp://0.0.0.0:12345\", \"tcp://233.233.233.233:26777\", 10);\n//Notice: On windows, you can only create one worker, or it will be not able to run.\n\nsetWorker(\"tcp://0.0.0.0:12345\", \"tcp://www.google.com:80\", 5);\n");
+        file_put_contents("./config.php", "<?php\n//This is the configration of GarageProxy-NoProtocol.\n//Config format: setWorker(string \$lisening, string\$remote-server, int \$worker-count)\n//\$listening and \$remote-server: [Protocol]://[Address]:[Port]\n//Example: setWorker(\"tcp://0.0.0.0:12345\", \"tcp://233.233.233.233:26777\", 10);\n\nsetWorker(\"tcp://0.0.0.0:12345\", \"tcp://www.google.com:80\", 5);\n");
     }
     // if(!is_dir(__DIR__ . "/Lang")){
     // mkdir("Lang");
