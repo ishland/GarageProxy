@@ -1,6 +1,5 @@
 #!/usr/bin/php
 <?php
-echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] Welcome to use GarageProxy! Current Version: 1.0-No-Protocol.\r\n";
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing Workerman...\r\n";
 use Workerman\Worker;
 use Workerman\Connection\AsyncTcpConnection;
@@ -21,10 +20,6 @@ function loadConfig()
         echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\r\n";
         file_put_contents("./config.php", "<?php\n//This is the configration of GarageProxy-NoProtocol.\n//Config format: setWorker(string \$lisening, string\$remote-server, int \$worker-count)\n//\$listening and \$remote-server: [Protocol]://[Address]:[Port]\n//Example: setWorker(\"tcp://0.0.0.0:12345\", \"tcp://233.233.233.233:26777\", 10);\n\nsetWorker(\"tcp://0.0.0.0:12345\", \"tcp://www.google.com:80\", 5);\n");
     }
-    // if(!is_dir(__DIR__ . "/Lang")){
-    // mkdir("Lang");
-    // file_put_contents(__DIR__ . "/Lang/en-us.php", "");
-    // }
     require_once "./config.php";
 }
 

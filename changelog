@@ -1,3 +1,6 @@
+v0.1-dev.3 Updates
++ Use bug-fixed workerman
+* Fixed some warning messages are shown.
 v0.1-dev.2 Updates
 - Built-in workerman
 - Only run mode

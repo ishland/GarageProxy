@@ -1,7 +1,8 @@
+#!/usr/bin/php
 <?php
 mkdir("cache");
 echo "Downloading workerman(changed)...\n";
-system("git clone -b patch-1 https://github.com/ishland/Workerman.git cache");
+system("git clone -b patch-2 https://github.com/ishland/Workerman.git cache");
 echo "Done.\n";
 echo "Building...\n";
 copy("./start.php", "./cache/start.php");
