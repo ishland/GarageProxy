@@ -1,26 +1,22 @@
 #!/usr/bin/php
 <?php
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing Workerman...\r\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\r\n";
 use Workerman\Worker;
 use Workerman\Connection\AsyncTcpConnection;
 require_once __DIR__ . '/Autoloader.php';
-if(!is_dir("./logs")) mkdir("./logs");
-Worker::$stdoutFile = './logs/latest.log';
-Worker::$pidFile = './.pid';
-Worker::$logFile = './logs/workerman.log';
+if(!file_exists(getcwd() . "/logs")) mkdir(getcwd() . "/logs");
+Worker::$stdoutFile = getcwd() . '/logs/latest.log';
+Worker::$pidFile = getcwd() . '/.pid';
+Worker::$logFile = getcwd() . '/logs/workerman.log';
 $workerid = 0;
-
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializtion of Workerman has completed.\r\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Registering Workers functions...\r\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registering the Worker Settings function...\r\n";
 
 function loadConfig()
 {
-    if (! file_exists("./config.php")) {
+    if (! file_exists(getcwd() . "/config.php")) {
         echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\r\n";
-        file_put_contents("./config.php", "<?php\n//This is the configration of GarageProxy-NoProtocol.\n//Config format: setWorker(string \$lisening, string\$remote-server, int \$worker-count)\n//\$listening and \$remote-server: [Protocol]://[Address]:[Port]\n//Example: setWorker(\"tcp://0.0.0.0:12345\", \"tcp://233.233.233.233:26777\", 10);\n\nsetWorker(\"tcp://0.0.0.0:12345\", \"tcp://www.google.com:80\", 5);\n");
+        file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
     }
-    require_once "./config.php";
+    require_once getcwd() . "/config.php";
 }
 
 function setWorker($listening, $remote, $workers)
@@ -49,9 +45,6 @@ function setWorker($listening, $remote, $workers)
     $$workerid->onConnect = 'onConnect';
     echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\r\n";
 }
-
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registration of the Worker Settings function has completed.\r\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registering the Worker Starting function...\r\n";
 
 function onWorkerStart($worker)
 {
@@ -118,8 +111,6 @@ function onConnect($connection)
 }
 ;
 
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registration of Worker Working functions has completed.\r\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Registration of Worker functions has completed.\r\n";
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Reading Settings...\r\n";
 
 loadConfig();
