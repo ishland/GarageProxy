@@ -1,0 +1,16 @@
+v0.1-dev.4 Updates
++ Use mormal workerman
++ More powerful build.php.
++ Added configuration directory.
+v0.1-dev.3 Updates
++ Use bug-fixed workerman
+* Fixed some warning messages are shown.
+v0.1-dev.2 Updates
+- Built-in workerman
+- Only run mode
++ Use bug-fixed workerman
+* Fixed when start in daemon mode, it can not stop
+v0.1-dev.1 Updates
++ Phar support.
+v0.1-dev.0 Updates (unavailable)
+First version.
