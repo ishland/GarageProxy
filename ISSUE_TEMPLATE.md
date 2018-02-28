@@ -6,3 +6,4 @@
 - Operating system, like Ubuntu server 17.10.
 - PHP version.
 - Other relevant information is allowed to appear in issue.
+### After you know these things, you can delete this and write your issue.
