@@ -4,7 +4,7 @@ echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\r\n";
 use Workerman\Worker;
 use Workerman\Connection\AsyncTcpConnection;
 require_once __DIR__ . '/Autoloader.php';
-if(!file_exists(getcwd() . "/logs")) mkdir(getcwd() . "/logs");
+@mkdir(getcwd() . "/logs");
 Worker::$stdoutFile = getcwd() . '/logs/latest.log';
 Worker::$pidFile = getcwd() . '/.pid';
 Worker::$logFile = getcwd() . '/logs/workerman.log';
