@@ -23,7 +23,7 @@ function checkEverything(){
         echo "\r[   OK   ] Operating System is not Windows.\n";
     } else {
         echo "\r[  Fatal ] Operating System is Windows.\n";
-        exit(-1);
+        exit(1);
     }
     echo "\r[    " . process() . "   ]Checking PHP version...\r";
     $phpver = substr(phpversion(), 0, 3);
@@ -31,7 +31,7 @@ function checkEverything(){
         echo "\r[   OK   ] PHP version {$phpver} >= 5.3.\n";
     } else {
         echo "\r[  Fatal ] PHP version {$phpver} < 5.3.\n";
-        exit(-1);
+        exit(1);
     }
     echo "\r[    " . process() . "   ]Checking required PHP Modules..." . process() . "\r";
     if(extension_loaded("posix")){
@@ -101,7 +101,7 @@ function checkEverything(){
         echo "\r[   OK   ]Finished with no errors! Continue.\n";
     } else {
         echo "\r[  Error ]Finished with {$errCount} errors. Please fix them and try again.\n";
-        exit(-2);
+        exit(1);
     }
 }
 function copydir($src, $dst){ 
@@ -174,7 +174,7 @@ if($argv[1] == "build"){
         echo "Making phar file...\n";
         makephar(__DIR__ . "/cache", "./GarageProxy.phar", "start.php");
         echo "Done.\n";
-        exit;
+        exit(0);
     }
 }
 exit($usage);
