@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\r\n";
 use Workerman\Worker;
