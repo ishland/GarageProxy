@@ -1,5 +1,5 @@
 ## GarageProxy
-Forwards anything from LAN.
+Forwards services from LAN.
 
 ### Requirements
 - PHP 5.3 or higher
