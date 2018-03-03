@@ -1,6 +1,9 @@
 ## GarageProxy
 Forwards services from LAN.
 
+### ClientSide
+- https://github.com/ishland/GarageProxy-Client
+
 ### Requirements
 - PHP 5.3 or higher
 - A POSIX compatible operating system (Linux, OSX, BSD)
