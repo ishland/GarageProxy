@@ -2,6 +2,7 @@
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\r\n";
 use Workerman\Worker;
 use Workerman\Connection\AsyncTcpConnection;
+use Workerman\Lib\Timer;
 require_once __DIR__ . '/Autoloader.php';
 @mkdir(getcwd() . "/logs");
 Worker::$stdoutFile = getcwd() . '/logs/latest.log';
@@ -45,16 +46,80 @@ function setWorker($listening, $remote, $workers)
     echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\r\n";
 }
 
+$timer = new Worker();
+$timer->count = 1;
+$timer->name = "timer";
+$timer->onWorkerStart = function($worker) {
+    echo "[" . date('Y-m-d H:i:s') . "][Master][Startup][Info] Timer started.\r\n";
+    $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:4400");
+    $conn_to_master->onClose = function ($connection) {
+        $connection->close();
+        $connection->connect();
+    };
+    $conn_to_master->onError = function ($connection_to_server) {
+        $connection->close();
+        $connection->connect();
+    };
+    $conn_to_master->connect();
+    Timer::add(1, function() use ($conn_to_master){
+        $conn_to_master->send(json_encode(Array("action" => "timer")));
+    });
+};
+
+$master = new Worker("tcp://127.0.0.1:4400");
+$master->count = 1;
+$master->name = "master";
+$master->onWorkerStart = function($worker) {
+    $worker->pps = 0;
+    $worker->pps_temp = 0;
+    $worker->active_conn = 0;
+    echo "[" . date('Y-m-d H:i:s') . "][Master][Startup][Info] Master started.\r\n";
+};
+$master->onMessage = function($connection, $buffer) use ($master){
+    $arr = json_decode($buffer, true);
+    if($arr['action'] == "new"){
+        $connection->workerid = $arr['worker'];
+        $connection->proxyid = $arr['proxy'];
+    }
+    if($arr['action'] == "new_conn"){
+        $connection->ip = $arr['ip'];
+        $connection->port = $arr['port'];
+        $master->active_conn ++;
+    }
+    if($arr['action'] == "new_msg"){
+        $master->pps_temp ++;
+    }
+    if($arr['action'] == "close_conn"){
+        $master->active_conn --;
+    }
+    if($arr['action'] == "timer"){
+        $master->pps = $master->pps_temp;
+        $master->pps_temp = 0;
+        echo "\rStatus: Active connections: " . $master->active_conn . ", PPS: " . $master->pps . "             \r";
+    }
+};
+
 function onWorkerStart($worker)
 {
-    $global_uid = 0;
+    sleep(1);
+    global $conn_to_master;
+    $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:4400");
+    $conn_to_master->onClose = function ($connection) {
+        $connection->close();
+        $connection->connect();
+    };
+    $conn_to_master->onError = function ($connection_to_server) {
+        $connection->close();
+        $connection->connect();
+    };
+    $conn_to_master->connect();
     global $ADDRESS, $global_uid, $workerid;
     global $$workerid;
+    $global_uid = 0;
     $ADDRESS = $worker->remote;
     $workerid = $worker->proxyid;
-    echo "[" . date('Y-m-d H:i:s') . "][worker:{$worker->proxyid}-{$worker->id}][Startup][Info] Worker {$worker->proxyid}-{$worker->id} started.\r\n";
-}
-;
+    $conn_to_master->send(json_encode(Array("action" => "new", "worker" => $worker->id, "proxy" => $worker->proxyid)));
+};
 
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registration of the Worker Starting function has completed.\r\n";
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registering Worker Working functions...\r\n";
@@ -63,49 +128,38 @@ function onConnect($connection)
 {
     global $workerid, $ADDRESS, $global_uid;
     global $$workerid;
+    global $conn_to_master;
     $connection->uid = ++ $global_uid;
-    $connection->msgid = 0;
     $connection->worker = $$workerid->id;
     $connection->proxyid = $$workerid->proxyid;
-    echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Info] A client connected this proxy using " . $connection->getRemoteIp() . ":" . $connection->getRemotePort() . ", and its uid is " . $connection->uid . ".\r\n[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Info] PreParing to connect to the server.\r\n";
+    $conn_to_master->send(json_encode(Array("action" => "new_conn", "ip" => $connection->getRemoteIp(), "port" => $connection->getRemotePort(), "uid" => $connection->uid)));
     $connection_to_server = new AsyncTcpConnection($ADDRESS);
     $connection_to_server->onMessage = function ($connection_to_server, $buffer) use ($connection) {
-        $connection->msgid ++;
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] Received a message from the server. Sending it to the client.\r\n";
+        global $conn_to_master;
+        $conn_to_master->send(json_encode(Array("action" => "new_msg")));
         $connection->send($buffer);
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] The message sent to the client.\r\n";
     };
     $connection_to_server->onClose = function ($connection_to_server) use ($connection) {
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] The connection closed by the server. Closing the connection to the client.\r\n";
         $connection->close();
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] Closed the connection to the client.\r\n";
     };
     $connection_to_server->onError = function ($connection_to_server, $errcode, $errmsg) use ($connection) {
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Error] The connection to the server made a mistake.({$errcode} {$errmsg}) Closing the connection to the client.\r\n";
         $connection->close();
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Info] Closed the connection to the client.\r\n";
     };
     
-    echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Info] Connecting...\r\n";
-    $conn = $connection_to_server->connect();
-    if ($conn == true)
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Info] Connected.\r\n";
+    $connection_to_server->connect();
     
     $connection->onMessage = function ($connection, $buffer) use ($connection_to_server) {
-        $connection->msgid ++;
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] Received a message from the client. Sending it to the server.\r\n";
+        global $conn_to_master;
+        $conn_to_master->send(json_encode(Array("action" => "new_msg")));
         $connection_to_server->send($buffer);
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] A message sent to the server.\r\n";
     };
     $connection->onClose = function ($connection) use ($connection_to_server) {
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] A connection closed by the client. Closing the connection to the server.\r\n";
+        global $conn_to_master;
+        $conn_to_master->send(json_encode(Array("action" => "close_conn", "uid" => $connection->uid)));
         $connection_to_server->close();
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Debug] Closed the connection to the server.\r\n";
     };
     $connection->onError = function ($connection, $errcode, $errormsg) use ($connection_to_server) {
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Error] The connection to the client made a mistake.({$errcode} {$errmsg}) Closing the connection to the server.\r\n";
         $connection_to_server->close();
-        echo "[" . date('Y-m-d H:i:s') . "][worker:{$connection->proxyid}-{$connection->id}][uid:{$connection->uid}][Msgs:{$connection->msgid}][Info] Closed a connection to the server.\r\n";
     };
 }
 ;
