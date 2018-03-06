@@ -49,18 +49,16 @@ function setWorker($listening, $remote, $workers)
 $timer = new Worker();
 $timer->count = 1;
 $timer->name = "timer";
-$timer->onWorkerStart = function($worker) {
-    echo "[" . date('Y-m-d H:i:s') . "][Master][Startup][Info] Timer started.\r\n";
+$timer->onWorkerStart = function($worker) {;
     $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:4400");
     $conn_to_master->onClose = function ($connection) {
-        $connection->close();
-        $connection->connect();
+        Worker::stopAll();
     };
     $conn_to_master->onError = function ($connection_to_server) {
-        $connection->close();
-        $connection->connect();
+        Worker::stopAll();
     };
     $conn_to_master->connect();
+    $conn_to_master->send(json_encode(Array("action" => "new", "worker" => "timer")));
     Timer::add(1, function() use ($conn_to_master){
         $conn_to_master->send(json_encode(Array("action" => "timer")));
     });
@@ -73,30 +71,65 @@ $master->onWorkerStart = function($worker) {
     $worker->pps = 0;
     $worker->pps_temp = 0;
     $worker->active_conn = 0;
+    $worker->speed = 0;
+    $worker->speed_temp = 0;
     echo "[" . date('Y-m-d H:i:s') . "][Master][Startup][Info] Master started.\r\n";
 };
 $master->onMessage = function($connection, $buffer) use ($master){
     $arr = json_decode($buffer, true);
     if($arr['action'] == "new"){
-        $connection->workerid = $arr['worker'];
-        $connection->proxyid = $arr['proxy'];
+        if($arr['worker'] == "timer"){
+            $connection->workerid = "timer";
+            echo "\r[" . date('Y-m-d H:i:s') . "][Master][Info] Timer started.\n";
+            echo "\rStatus: Conns: " . $master->active_conn . ", PPS: " . $master->pps . ", Speed: " . round($master->speed / 1024, 3) . "KB/s             \r";
+        } else {
+            $connection->workerid = $arr['worker'];
+            $connection->proxyid = $arr['proxy'];
+            echo "\r[" . date('Y-m-d H:i:s') . "][Master][Info] Worker {$connection->proxyid}-{$connection->workerid} started.\n";
+            echo "\rStatus: Conns: " . $master->active_conn . ", PPS: " . $master->pps . ", Speed: " . round($master->speed / 1024, 3) . "KB/s             \r";
+        }
     }
     if($arr['action'] == "new_conn"){
         $connection->ip = $arr['ip'];
         $connection->port = $arr['port'];
+        $connection->uid = $arr['uid'];
         $master->active_conn ++;
+        echo "\r[" . date('Y-m-d H:i:s') . "][Master][Info][User: {$connection->proxyid}-{$connection->workerid}-{$connection->uid}] Server bridge [/{$connection->ip}:$connection->port] connected.\n";
+        echo "\rStatus: Conns: " . $master->active_conn . ", PPS: " . $master->pps . ", Speed: " . round($master->speed / 1024, 3) . "KB/s             \r";
+        
     }
     if($arr['action'] == "new_msg"){
         $master->pps_temp ++;
+        $master->speed_temp = $master->speed_temp + $arr["strlen"];
     }
     if($arr['action'] == "close_conn"){
+        $connection->ip = $arr['ip'];
+        $connection->port = $arr['port'];
+        $connection->uid = $arr['uid'];
         $master->active_conn --;
+        echo "\r[" . date('Y-m-d H:i:s') . "][Master][Info][User: {$connection->proxyid}-{$connection->workerid}-{$connection->uid}] Server bridge [/{$connection->ip}:$connection->port] disconnected.\n";
+        echo "\rStatus: Conns: " . $master->active_conn . ", PPS: " . $master->pps . ", Speed: " . round($master->speed / 1024, 3) . "KB/s             \r";
     }
     if($arr['action'] == "timer"){
         $master->pps = $master->pps_temp;
         $master->pps_temp = 0;
-        echo "\rStatus: Active connections: " . $master->active_conn . ", PPS: " . $master->pps . "             \r";
+        $master->speed = $master->speed_temp;
+        $master->speed_temp = 0;
+        echo "\rStatus: Conns: " . $master->active_conn . ", PPS: " . $master->pps . ", Speed: " . round($master->speed / 1024, 3) . "KB/s             \r";
     }
+};
+$master->onClose = function($connection) use ($master) {
+    if($connection->workerid == "timer"){
+        echo "[" . date('Y-m-d H:i:s') . "][Master][Info] Timer stopped.\n";
+        unset($connection->workerid);
+    } else {
+        echo "[" . date('Y-m-d H:i:s') . "][Master][Info] Worker {$connection->proxyid}-{$connection->workerid} stopped.\n";
+        unset($connection->proxyid);
+        unset($connection->workerid);
+    }
+};
+$master->onWorkerStop = function($worker) {
+    echo "[" . date('Y-m-d H:i:s') . "][Master][Info] Master stopped.\r\n";
 };
 
 function onWorkerStart($worker)
@@ -105,12 +138,10 @@ function onWorkerStart($worker)
     global $conn_to_master;
     $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:4400");
     $conn_to_master->onClose = function ($connection) {
-        $connection->close();
-        $connection->connect();
+        Worker::stopAll();
     };
     $conn_to_master->onError = function ($connection_to_server) {
-        $connection->close();
-        $connection->connect();
+        Worker::stopAll();
     };
     $conn_to_master->connect();
     global $ADDRESS, $global_uid, $workerid;
@@ -118,7 +149,7 @@ function onWorkerStart($worker)
     $global_uid = 0;
     $ADDRESS = $worker->remote;
     $workerid = $worker->proxyid;
-    $conn_to_master->send(json_encode(Array("action" => "new", "worker" => $worker->id, "proxy" => $worker->proxyid)));
+    $conn_to_master->send(json_encode(Array("action" => "new", "worker" => $worker->id + 1, "proxy" => $worker->proxyid)));
 };
 
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registration of the Worker Starting function has completed.\r\n";
@@ -136,7 +167,7 @@ function onConnect($connection)
     $connection_to_server = new AsyncTcpConnection($ADDRESS);
     $connection_to_server->onMessage = function ($connection_to_server, $buffer) use ($connection) {
         global $conn_to_master;
-        $conn_to_master->send(json_encode(Array("action" => "new_msg")));
+        $conn_to_master->send(json_encode(Array("action" => "new_msg", "strlen" => strlen($buffer))));
         $connection->send($buffer);
     };
     $connection_to_server->onClose = function ($connection_to_server) use ($connection) {
@@ -150,12 +181,12 @@ function onConnect($connection)
     
     $connection->onMessage = function ($connection, $buffer) use ($connection_to_server) {
         global $conn_to_master;
-        $conn_to_master->send(json_encode(Array("action" => "new_msg")));
+        $conn_to_master->send(json_encode(Array("action" => "new_msg", "strlen" => strlen($buffer))));
         $connection_to_server->send($buffer);
     };
     $connection->onClose = function ($connection) use ($connection_to_server) {
         global $conn_to_master;
-        $conn_to_master->send(json_encode(Array("action" => "close_conn", "uid" => $connection->uid)));
+        $conn_to_master->send(json_encode(Array("action" => "close_conn", "ip" => $connection->getRemoteIp(), "port" => $connection->getRemotePort(), "uid" => $connection->uid)));
         $connection_to_server->close();
     };
     $connection->onError = function ($connection, $errcode, $errormsg) use ($connection_to_server) {
