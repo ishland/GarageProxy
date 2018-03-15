@@ -1,3 +1,6 @@
+v0.2-dev.4 Updates
++ Client
++ Compression
 v0.2-dev.3 Updates
 * Fixed when proxy-master is killed, it will restart.
 v0.2-dev.2 Updates

@@ -1,5 +1,5 @@
 <?php
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\r\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\n";
 use Workerman\Worker;
 use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Connection\TcpConnection;
@@ -16,7 +16,7 @@ $workerid = 0;
 function loadConfig()
 {
     if (! file_exists(getcwd() . "/config.php")) {
-        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\r\n";
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\n";
         file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
@@ -27,15 +27,15 @@ function setWorker($listening, $remote, $workers)
     global $workerid;
     $workerid = $workerid + 1;
     global $$workerid;
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Setting up Worker-{$workerid}...\r\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Setting up Worker-{$workerid}...\n";
     if (! $listening or ! $remote or ! $workers) {
         echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Error] Configuration is not vaild! While setting up Worker-{$workerid}!";
         echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Error] Configuration of Worker-{$workerid} has failed!";
         return false;
     }
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] The settings of Worker-{$workerid} is:\r\n";
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Worker count: {$workers}\r\n";
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Forwarding: {$listening} -> {$remote}\r\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] The settings of Worker-{$workerid} is:\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Worker count: {$workers}\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Forwarding: {$listening} -> {$remote}\n";
     $$workerid = new Worker($listening);
     $$workerid->count = $workers;
     $$workerid->name = "worker" . $workerid;
@@ -46,7 +46,7 @@ function setWorker($listening, $remote, $workers)
         onWorkerStart($worker);
     };
     $$workerid->onConnect = 'onConnect';
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\r\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\n";
 }
 
 $timer = new Worker();
@@ -77,7 +77,7 @@ $master->onWorkerStart = function($worker) {
     $worker->active_conn = 0;
     $worker->speed = Array("in" => 0, "out" => 0);
     $worker->speed_temp = Array("in" => 0, "out" => 0);
-    echo "[" . date('Y-m-d H:i:s') . "][Master][Startup][Info] Master started.\r\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Master][Startup][Info] Master started.\n";
 };
 $master->onMessage = function($connection, $buffer) use ($master){
     $arr = json_decode($buffer, true);
@@ -153,7 +153,7 @@ $master->onClose = function($connection) use ($master) {
     }
 };
 $master->onWorkerStop = function($worker) {
-    echo "[" . date('Y-m-d H:i:s') . "][Master][Info] Master stopped.\r\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Master][Info] Master stopped.\n";
 };
 
 function onWorkerStart($worker)
@@ -178,8 +178,8 @@ function onWorkerStart($worker)
     $conn_to_master->send(json_encode(Array("action" => "new", "worker" => $worker->id + 1, "proxy" => $worker->proxyid)));
 };
 
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registration of the Worker Starting function has completed.\r\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registering Worker Working functions...\r\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registration of the Worker Starting function has completed.\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Registering Worker Working functions...\n";
 
 function onConnect($connection)
 {
@@ -189,10 +189,19 @@ function onConnect($connection)
     $connection->uid = ++ $global_uid;
     $connection->worker = $$workerid->id;
     $connection->proxyid = $$workerid->proxyid;
+    $connection->compression = false;
+    $connection->firstmsg = true;
     $conn_to_master->send(json_encode(Array("action" => "new_conn", "ip" => $connection->getRemoteIp(), "port" => $connection->getRemotePort(), "uid" => $connection->uid)));
     $connection_to_server = new AsyncTcpConnection($ADDRESS);
     $connection_to_server->onMessage = function ($connection_to_server, $buffer) use ($connection) {
         global $conn_to_master;
+        if($connection->compression){
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
+            $compressed = gzdeflate($buffer, 9);
+            $connection->send($compressed);
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($compressed), "uid" => $connection->uid)));
+            return;
+        }
         $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
         $connection->send($buffer);
         $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($buffer), "uid" => $connection->uid)));
@@ -214,9 +223,32 @@ function onConnect($connection)
     
     $connection->onMessage = function ($connection, $buffer) use ($connection_to_server) {
         global $conn_to_master;
+        if($connection->firstmsg){
+            if(substr($buffer, 0, 17) !== "GarageProxyClient"){
+                $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
+                $connection_to_server->send($buffer);
+                $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($buffer), "uid" => $connection->uid)));
+                $connection->firstmsg = false;
+                return;
+            }
+            $arr = json_decode(substr($buffer, 17), true);
+            $connection->compression = $arr['compression'];
+            $connection->firstmsg = false;
+            $connection->send("GarageProxy-OK");
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
+            return;
+        }
+        if($connection->compression){
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
+            $uncompressed = gzinflate($buffer);
+            $connection_to_server->send($uncompressed);
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($uncompressed), "uid" => $connection->uid)));
+            return;
+        }
         $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
         $connection_to_server->send($buffer);
         $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($buffer), "uid" => $connection->uid)));
+        $connection->firstmsg = false;
     };
     $connection->onClose = function ($connection) use ($connection_to_server) {
         global $conn_to_master;
@@ -236,13 +268,13 @@ function onConnect($connection)
     };
 };
 
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Reading Settings...\r\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Reading Settings...\n";
 
 loadConfig();
 
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration has completed.\r\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializtion has completed.\r\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] Launching Workerman...\r\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration has completed.\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializtion has completed.\n";
+echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] Launching Workerman...\n";
 echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] ";
 
 Worker::runAll();

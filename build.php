@@ -105,7 +105,7 @@ function checkEverything(){
     }
 }
 function copydir($src, $dst){ 
-    echo "Copying\t{$src}...";
+    //echo "Copying dir\t{$src}...\n";
     $dir = opendir($src);
     @mkdir($dst);
     while(($file = readdir($dir)) !== false) { 
@@ -113,7 +113,7 @@ function copydir($src, $dst){
             if(is_dir($src . '/' . $file)) { 
                 copydir($src . '/' . $file, $dst . '/' . $file); 
             } else { 
-                echo "Copying\t" . $src . '/' . $file . "\n";
+                //echo "Copying file\t" . $src . '/' . $file . "\n";
                 copy($src . '/' . $file, $dst . '/' . $file); 
             } 
         } 
@@ -121,12 +121,12 @@ function copydir($src, $dst){
   closedir($dir); 
 } 
 function copyfile($src, $dst){
-  echo "Copying\t{$src}\n";
+  //echo "Copying file\t{$src}\n";
   copy($src, $dst);
   echo "\n";
 }
 function deldir($dir){
-  echo "Deleting dir\t{$dir}\n";
+  //echo "Deleting dir\t{$dir}\n";
   if(!is_dir($dir)) return;
   if(count(scandir($dir))==2){rmdir($dir);return;}
   $dh = opendir($dir);
@@ -134,7 +134,7 @@ function deldir($dir){
     if($file != '.' && $file != '..') {
       $fullpath = $dir . "/" . $file;
       if(is_file($fullpath)) {
-          echo "Deleting file\t{$fullpath}\n";
+          //echo "Deleting file\t{$fullpath}\n";
           unlink($fullpath);
       } 
       if(is_dir($fullpath)){
@@ -167,12 +167,27 @@ if($argv[1] == "build"){
         system("git clone https://github.com/walkor/Workerman.git cache");
         echo "Done.\n";
         case "cached":
+        echo "Deleting the last build files...\n";
+        @mkdir("tmp");
+        deldir("./tmp");
         echo "Building...\n";
+        echo "Building server side...\n";
+        @mkdir("tmp");
         echo "Copying files...\n";
-        copy("./start.php", "./cache/start.php");
-        copydir("./defaults", "./cache/defaults");
+        copydir("./cache", "./tmp");
+        copydir("./main/server-side", "./tmp");
         echo "Making phar file...\n";
-        makephar(__DIR__ . "/cache", "./GarageProxy.phar", "start.php");
+        makephar(__DIR__ . "/tmp", "./GarageProxyServer.phar", "start.php");
+        echo "Done.\n";
+        echo "Building client side...\n";
+        deldir("./tmp");
+        @mkdir("tmp");
+        echo "Copying files...\n";
+        copydir("./cache", "./tmp");
+        copydir("./main/client-side", "./tmp");
+        echo "Making phar file...\n";
+        makephar(__DIR__ . "/tmp", "./GarageProxyClient.phar", "start.php");
+        deldir("./tmp");
         echo "Done.\n";
         exit(0);
     }
