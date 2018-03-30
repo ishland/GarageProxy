@@ -47,7 +47,7 @@ function onWorkerStart($worker)
     $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:4400");
     $conn_to_master->onClose = function ($connection) use ($worker){
         global $ADDRESS, $global_uid, $workerid;
-        $connection->reConnect(1);
+        $connection->reConnect();
         $connection->send(json_encode(Array("action" => "reconn", "worker" => $worker->id + 1, "proxy" => $worker->proxyid)));
     };
     $conn_to_master->onError = function ($connection_to_server) {
