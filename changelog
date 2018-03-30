@@ -1,3 +1,18 @@
+v0.2 Updates
+* Bug fixes
+v0.2-dev.5 Updates
++ More clear diretory
+v0.2-dev.4 Updates
++ Client
++ Compression
+v0.2-dev.3 Updates
+* Fixed when proxy-master is killed, it will restart.
+v0.2-dev.2 Updates
++ Speed displays
++ Messages displays
+v0.2-dev.1 Updates
++ Master process and Timer process
++ PPS and connection displays
 v0.1 Updates
 + Added build.php exit codes.
 v0.1-dev.5 Updates

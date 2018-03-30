@@ -6,7 +6,11 @@ Forwards services from LAN.
 - Gitee: https://gitee.com/ishland/GarageProxy
 - Coding: https://coding.net/u/ishland/p/GarageProxy/git?public=true
 
+<<<<<<< HEAD
 ## Requirements
+=======
+### Requirements
+>>>>>>> develop
 - PHP 5.3 or higher
 - A POSIX compatible operating system (Linux, OSX, BSD)
 - POSIX and PCNTL extensions for PHP
