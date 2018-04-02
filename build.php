@@ -11,6 +11,7 @@ function process(){
     if($process == 4) return "\\";
 }
 function makephar($dir, $name, $default){
+    @unlink($name);
     $phar = new Phar($name);
     if(!$phar) exit("[Fatal Error] Error while making phar. Please ensure that phar.readonly is disabled in php.ini.\n");
     $phar->buildFromDirectory($dir);
@@ -18,14 +19,14 @@ function makephar($dir, $name, $default){
 }
 function checkEverything(){
     $errCount = 0;
-    echo "\r[    " . process() . "   ]Checking Operating System...\r";
+    echo "\r[    " . process() . "   ] Checking Operating System...\r";
     if(!strstr(PHP_OS, "WIN")){
         echo "\r[   OK   ] Operating System is not Windows.\n";
     } else {
         echo "\r[  Fatal ] Operating System is Windows.\n";
         exit(1);
     }
-    echo "\r[    " . process() . "   ]Checking PHP version...\r";
+    echo "\r[    " . process() . "   ] Checking PHP version...\r";
     $phpver = substr(phpversion(), 0, 3);
     if($phpver >= 5.3){
         echo "\r[   OK   ] PHP version {$phpver} >= 5.3.\n";
@@ -33,23 +34,23 @@ function checkEverything(){
         echo "\r[  Fatal ] PHP version {$phpver} < 5.3.\n";
         exit(1);
     }
-    echo "\r[    " . process() . "   ]Checking required PHP Modules..." . process() . "\r";
+    echo "\r[    " . process() . "   ] Checking required PHP Modules..." . process() . "\r";
     if(extension_loaded("posix")){
-        echo "\r[   OK   ] PHP Module Posix currently installed and loaded.\n\r[    " . process() . "   ]Checking required PHP Modules...\r";
+        echo "\r[   OK   ] PHP Module Posix currently installed and loaded.\n\r[    " . process() . "   ] Checking required PHP Modules...\r";
     } else {
-        echo "\r[  Error ] PHP Module Posix could not found.\n\r[    " . process() . "   ]Checking required PHP Modules...\r";
+        echo "\r[  Error ] PHP Module Posix could not found.\n\r[    " . process() . "   ] Checking required PHP Modules...\r";
         $errCount++;
     }
     if(extension_loaded("pcntl")){
-        echo "\r[   OK   ] PHP Module Pcntl currently installed and loaded.\n\r[    " . process() . "   ]Checking required PHP Modules...\r";
+        echo "\r[   OK   ] PHP Module Pcntl currently installed and loaded.\n\r[    " . process() . "   ] Checking required PHP Modules...\r";
     } else {
-        echo "\r[  Error ] PHP Module Pcntl could not found.\n\r[    " . process() . "   ]Checking required PHP Modules...\r";
+        echo "\r[  Error ] PHP Module Pcntl could not found.\n\r[    " . process() . "   ] Checking required PHP Modules...\r";
         $errCount++;
     }
     if(extension_loaded("Phar")){
-        echo "\r[   OK   ] PHP Module Phar currently installed and loaded.\n\r[    " . process() . "   ]Checking required PHP Modules...\r";
+        echo "\r[   OK   ] PHP Module Phar currently installed and loaded.\n\r[    " . process() . "   ] Checking required PHP Modules...\r";
     } else {
-        echo "\r[  Error ] PHP Module Phar could not found.\n\r[    " . process() . "   ]Checking required PHP Modules...\r";
+        echo "\r[  Error ] PHP Module Phar could not found.\n\r[    " . process() . "   ] Checking required PHP Modules...\r";
         $errCount++;
     }
     if(extension_loaded("sockets")){
@@ -58,14 +59,14 @@ function checkEverything(){
         echo "\r[  Error ] PHP Module Sockets could not found.\n";
         $errCount++;
     }
-    echo "\r[    " . process() . "   ]Checking \"git\" command...\r";
+    echo "\r[    " . process() . "   ] Checking \"git\" command...\r";
     if(exec("git")){
         echo "\r[   OK   ] \"git\" command is available.\n";
     } else {
         echo "\r[  Error ] \"git\" command is not available.\n";
         $errCount++;
     }
-    echo "\r[    " . process() . "   ]Checking writing...\r";
+    echo "\r[    " . process() . "   ] Checking writing...\r";
     $i = 10000;
     while($i > 0){
         $file = fopen("./.tmp", "a");
@@ -74,33 +75,34 @@ function checkEverything(){
         fclose($file);
         $i--;
         $per = (10000 - $i) / 10000 * 100;
-        echo "\r[    " . process() . "   ]Checking writing... {$per}%\r";
+        echo "\r[    " . process() . "   ] Checking writing... {$per}%\r";
     }
     if($i == 0){
-        echo "\r[   OK   ] Writing sucessfully.     \n";
+        echo "\r[   OK   ] Writing successfully.      \n";
     } else {
-        echo "\r[  Error ] Writing failed.          \n";
+        echo "\r[  Error ] Writing failed.            \n";
         $errCount++;
     }
-    echo "\r[    " . process() . "   ]Checking reading...\r";
+    echo "\r[    " . process() . "   ] Checking reading...\r";
     $i = 10000;
     while($i > 0){
         file_get_contents("./.tmp");
         $i--;
         $per = (10000 - $i) / 10000 * 100;
-        echo "\r[    " . process() . "   ]Checking reading... {$per}%\r";
+        echo "\r[    " . process() . "   ] Checking reading... {$per}%\r";
     }
     if($i == 0){
-        echo "\r[   OK   ] Reading sucessfully.     \n";
+        echo "\r[   OK   ] Reading successfully.      \n";
     } else {
-        echo "\r[  Error ] Reading failed.          \n";
+        echo "\r[  Error ] Reading failed.            \n";
         $errCount++;
     }
+    unlink("./.tmp");
     //finish
     if($errCount == 0){
-        echo "\r[   OK   ]Finished with no errors! Continue.\n";
+        echo "\r[   OK   ] Finished with no errors! Continue.\n";
     } else {
-        echo "\r[  Error ]Finished with {$errCount} errors. Please fix them and try again.\n";
+        echo "\r[  Error ] Finished with {$errCount} errors. Please fix them and try again.\n";
         exit(1);
     }
 }
