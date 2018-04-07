@@ -2,7 +2,7 @@
 Forwards services from LAN.
 
 ## Git repositories
-- Github (Please send the PRs here): https://github.com/ishland/GarageProxy
+- Github (Main repository): https://github.com/ishland/GarageProxy
 - Gitee: https://gitee.com/ishland/GarageProxy
 - Coding: https://coding.net/u/ishland/p/GarageProxy/git?public=true
 
