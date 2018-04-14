@@ -6,6 +6,9 @@ Forwards services from LAN.
 - Gitee: https://gitee.com/ishland/GarageProxy
 - Coding: https://coding.net/u/ishland/p/GarageProxy/git?public=true
 
+## Our Discord Server
+https://discordapp.com/invite/Py4an4g
+
 ## Requirements
 - PHP 5.3 or higher
 - A POSIX compatible operating system (Linux, OSX, BSD)
