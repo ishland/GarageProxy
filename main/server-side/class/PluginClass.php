@@ -1,6 +1,7 @@
 <?php
 
 class PluginClass{
+    global $pluginList;
     private $name;
     private $version;
     private $state;
@@ -11,6 +12,7 @@ class PluginClass{
     
     
     public function __construct($name, $version){
+        global $pluginList;
         $this->name = $name;
         $this->version = $version;
     }
@@ -18,7 +20,7 @@ class PluginClass{
     protected function PluginLoad(){
         //try to emit onPluginLoad
         if($this->state == "loaded") return false;
-        if(is_callable($this->onPluginLoad)) call_user_func_array($this->onPluginLoad, array());
+        call_user_func_array($this->onPluginLoad, array());
         $this->state = "loaded";
     }
 }

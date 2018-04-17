@@ -26,6 +26,9 @@ function loadConfig()
         file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
+    foreach(CONFIG["workers"] as $arr){
+        setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
+    }
 }
 
 function setWorker($listening, $remote, $workers)

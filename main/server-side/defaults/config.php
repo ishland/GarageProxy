@@ -9,7 +9,7 @@ define('CONFIG', Array(
             'processes' => 6
         ),
         Array(
-            'addr' => "tcp://0.0.0.0:12345",
+            'addr' => "tcp://0.0.0.0:12346",
             'remote' => "tcp://www.youtube.com",
             'processes' => 6
         )
