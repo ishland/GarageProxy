@@ -1,7 +1,6 @@
 <?php
 
 class PluginClass{
-    global $pluginList;
     private $name;
     private $version;
     private $state;

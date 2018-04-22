@@ -1,2 +1,4 @@
 <?php
-class PluginClassLoader
+class PluginClassLoader{
+    
+}
