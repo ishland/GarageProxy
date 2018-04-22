@@ -1,2 +1,5 @@
 language: php
 script: php build.php build normal
+cache:
+  directories:
+  - ./target

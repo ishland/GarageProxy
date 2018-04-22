@@ -205,7 +205,8 @@ if($argv[1] == "build"){
         copydir("./cache", "./tmp");
         copydir("./main/server-side", "./tmp");
         echo "Making phar file...\n";
-        makephar(__DIR__ . "/tmp", "./GarageProxyServer.phar", "launcher.php");
+        @mkdir("target");
+        makephar(__DIR__ . "/tmp", "./target/GarageProxyServer.phar", "launcher.php");
         echo "Done.\n";
         echo "Building client side...\n";
         deldir("./tmp");
@@ -214,7 +215,7 @@ if($argv[1] == "build"){
         copydir("./cache", "./tmp");
         copydir("./main/client-side", "./tmp");
         echo "Making phar file...\n";
-        makephar(__DIR__ . "/tmp", "./GarageProxyClient.phar", "start.php");
+        makephar(__DIR__ . "/tmp", "./target/GarageProxyClient.phar", "start.php");
         deldir("./tmp");
         echo "Done.\n";
         exit(0);
