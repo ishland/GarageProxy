@@ -26,13 +26,14 @@ function loadConfig()
         file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
-    if(CONFIG["settings"]["mode"] == 1){
-        foreach(CONFIG["workers"] as $arr){
+    $config = CONFIG; // For older than 5.4 versions
+    if($config["settings"]["mode"] == 1){
+        foreach($config["workers"] as $arr){
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
         }
     } else {
         echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Warn] Configuration is not vaild! Mode is invaild! Using mode 1.";
-        foreach(CONFIG["workers"] as $arr){
+        foreach($config["workers"] as $arr){
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
         }
     }
