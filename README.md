@@ -1,6 +1,15 @@
 # GarageProxy
 Forwards services from LAN.
 
+## Build Status in Travis CI
+- Super Develop [![Build Status](https://travis-ci.org/ishland/GarageProxy.svg?branch=super-develop)](https://travis-ci.org/ishland/GarageProxy)
+- Develop
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[![Build Status](https://travis-ci.org/ishland/GarageProxy.svg?branch=develop)](https://travis-ci.org/ishland/GarageProxy)
+- Master
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[![Build Status](https://travis-ci.org/ishland/GarageProxy.svg?branch=master)](https://travis-ci.org/ishland/GarageProxy)
+
 ## Git repositories
 - Github (Main repository): https://github.com/ishland/GarageProxy
 - Gitee: https://gitee.com/ishland/GarageProxy
