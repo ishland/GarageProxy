@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 $process = 0;
+$fileErrors = 0;
 function process(){
     global $process;
     $process++;
@@ -106,6 +107,25 @@ function checkEverything(){
         exit(1);
     }
 }
+function checkFiles($src = "./main"){
+    global $fileErrors;
+    $dir = opendir($src);
+    while(($file = readdir($dir)) !== false) { 
+        if(($file != '.') && ($file != '..')) { 
+            if(is_dir($src . '/' . $file)) { 
+                checkFiles($src . '/' . $file); 
+            } else { 
+                $result = exec("php -l " . $src . '/' . $file);
+                if(strchr($result, "Errors parsing")){
+                    $fileErrors++;
+                    echo "[Error] Parsing error, the script will exit.\n";
+                }
+                echo $result . "\n";
+            } 
+        } 
+    } 
+   closedir($dir);
+}
 function copydir($src, $dst){ 
     //echo "Copying dir\t{$src}...\n";
     $dir = opendir($src);
@@ -120,45 +140,48 @@ function copydir($src, $dst){
             } 
         } 
     } 
-  closedir($dir); 
-} 
+   closedir($dir); 
+}
 function copyfile($src, $dst){
-  //echo "Copying file\t{$src}\n";
-  copy($src, $dst);
-  echo "\n";
+    //echo "Copying file\t{$src}\n";
+    copy($src, $dst);
+    //echo "\n";
 }
 function deldir($dir){
-  //echo "Deleting dir\t{$dir}\n";
-  if(!is_dir($dir)) return;
-  if(count(scandir($dir))==2){rmdir($dir);return;}
-  $dh = opendir($dir);
-  while($file=readdir($dh)) {
-    if($file != '.' && $file != '..') {
-      $fullpath = $dir . "/" . $file;
-      if(is_file($fullpath)) {
-          //echo "Deleting file\t{$fullpath}\n";
-          unlink($fullpath);
-      } 
-      if(is_dir($fullpath)){
-          if(count(scandir($fullpath))==2){
-              rmdir($fullpath);
-          } else {
-              deldir($fullpath);
-          }
-      }
+    //echo "Deleting dir\t{$dir}\n";
+    if(!is_dir($dir)) return;
+    if(count(scandir($dir))==2){rmdir($dir);return;}
+    $dh = opendir($dir);
+    while($file=readdir($dh)) {
+        if($file != '.' && $file != '..') {
+            $fullpath = $dir . "/" . $file;
+            if(is_file($fullpath)) {
+                //echo "Deleting file\t{$fullpath}\n";
+                unlink($fullpath);
+            } 
+            if(is_dir($fullpath)){
+                if(count(scandir($fullpath))==2){
+                    rmdir($fullpath);
+                } else {
+                    deldir($fullpath);
+                }
+            }
+        }
     }
-  }
  
-  closedir($dh);
-  if(rmdir($dir)) {
-    return true;
-  } else {
-    return false;
-  }
+    closedir($dh);
+    if(rmdir($dir)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 $usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete cached files and download it.)\n\tcached\tUse cached files to build.\n";
 if($argv[1] == "build"){
-    if(!$argv[2]) exit($usage);
+    if(!$argv[2]){
+        echo $usage;
+        exit(1);
+    }
     echo "Checking everything...\n";
     checkEverything();
     switch($argv[2]){
@@ -169,6 +192,9 @@ if($argv[1] == "build"){
         system("git clone https://github.com/walkor/Workerman.git cache");
         echo "Done.\n";
         case "cached":
+        echo "Checking if there are some grammer errors.\n";
+        checkFiles();
+        if($fileErrors > 0) exit(2);
         echo "Deleting the last build files...\n";
         @mkdir("tmp");
         deldir("./tmp");
@@ -179,7 +205,7 @@ if($argv[1] == "build"){
         copydir("./cache", "./tmp");
         copydir("./main/server-side", "./tmp");
         echo "Making phar file...\n";
-        makephar(__DIR__ . "/tmp", "./GarageProxyServer.phar", "start.php");
+        makephar(__DIR__ . "/tmp", "./GarageProxyServer.phar", "launcher.php");
         echo "Done.\n";
         echo "Building client side...\n";
         deldir("./tmp");
@@ -194,4 +220,5 @@ if($argv[1] == "build"){
         exit(0);
     }
 }
-exit($usage);
+echo $usage;
+exit(1);
