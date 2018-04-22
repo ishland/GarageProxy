@@ -1,0 +1,2 @@
+language: php
+script: php build.php build normal
