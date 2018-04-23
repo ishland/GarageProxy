@@ -7,8 +7,9 @@ use Workerman\Lib\Timer;
 $timer = new Worker();
 $timer->count = 1;
 $timer->name = "timer";
-$timer->onWorkerStart = function($worker) {;
-    $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:4400");
+$timer->onWorkerStart = function($worker) {
+    global $masterport;
+    $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:" . $masterport);
     $conn_to_master->onClose = function ($connection) {
         $connection->reConnect();
         $connection->send(json_encode(Array("action" => "reconn", "worker" => "timer")));

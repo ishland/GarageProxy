@@ -4,7 +4,7 @@ use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Connection\TcpConnection;
 use Workerman\Lib\Timer;
 
-$master = new Worker("tcp://127.0.0.1:4400");
+$master = new Worker("tcp://127.0.0.1:" . $masterport);
 $master->count = 1;
 $master->name = "proxy-master";
 $master->onWorkerStart = function($worker) {

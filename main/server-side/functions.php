@@ -4,6 +4,21 @@ use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Connection\TcpConnection;
 use Workerman\Lib\Timer;
 
+function allocatePorts()
+{
+    global $masterport;
+    $check = new PortChecker();
+    while(true){
+        $masterport = rand(40000, 65535);
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Allocating port {$masterport} to master... ";
+        if($check->check("127.0.0.1", $masterport) == 1 && $check->check("127.0.0.1", $masterport) == 0){
+            echo "failed.\n";
+            continue;
+        }
+        echo "success.\n";
+        break;
+    }
+}
 function loadConfig()
 {
     if (! file_exists(getcwd() . "/config.php")) {
@@ -11,6 +26,17 @@ function loadConfig()
         file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
+    $config = CONFIG; // For older than 5.4 versions
+    if($config["settings"]["mode"] == 1){
+        foreach($config["workers"] as $arr){
+            setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
+        }
+    } else {
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Warn] Configuration is not vaild! Mode is invaild! Using mode 1.";
+        foreach($config["workers"] as $arr){
+            setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
+        }
+    }
 }
 
 function setWorker($listening, $remote, $workers)
@@ -43,8 +69,8 @@ function setWorker($listening, $remote, $workers)
 function onWorkerStart($worker)
 {
     sleep(1);
-    global $conn_to_master;
-    $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:4400");
+    global $conn_to_master, $masterport;
+    $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:" . $masterport);
     $conn_to_master->onClose = function ($connection) use ($worker){
         global $ADDRESS, $global_uid, $workerid;
         $connection->reConnect();
