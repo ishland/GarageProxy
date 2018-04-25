@@ -28,9 +28,8 @@ https://discordapp.com/invite/Py4an4g
 - A POSIX compatible operating system (Linux, OSX, BSD)
 - POSIX and PCNTL extensions for PHP
 
-## Installation (Build them and run)
+## Building Guide
 - Download all the files to your server.
 - Run `php build.php build normal`
-- Run `php GarageProxy.phar start [-d]`
-- Enjoy.
+- The phar files will be in "target" directory.
 
