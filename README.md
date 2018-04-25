@@ -17,6 +17,7 @@ Super Develop
 ## Git repositories
 - Github (Main repository): https://github.com/ishland/GarageProxy
 - BitBucket: https://bitbucket.org/ishland/garageproxy
+- GitLab: https://gitlab.com/ishland/GarageProxy
 - Gitee: https://gitee.com/ishland/GarageProxy
 - Coding: https://coding.net/u/ishland/p/GarageProxy/git?public=true
 
