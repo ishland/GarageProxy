@@ -1,2 +1,4 @@
 language: php
 script: php build.php build normal
+notifications:
+  webhooks: https://discordapp.com/api/webhooks/439744310599090176/v_Q_XNvhFmcOO8oby7gQXdbRPV-0T7wrnDPNXqFTmfvGJBtzkunswjWzhqvqNUWQj4jz
