@@ -15,6 +15,7 @@ TcpConnection::$defaultMaxSendBufferSize = 256*1024*1024;
 TcpConnection::$maxPackageSize = 256*1024*1024;
 $workerid = 0;
 
+checkEverything();
 allocatePorts();
 require_once __DIR__ . '/workers/master.php';
 require_once __DIR__ . '/workers/timer.php';
