@@ -1,18 +1,24 @@
 # GarageProxy
 Forwards services from LAN.
 
-## Build Status in Travis CI
+## Status of every branch
 Master
 
 [![Build Status](https://travis-ci.org/ishland/GarageProxy.svg?branch=master)](https://travis-ci.org/ishland/GarageProxy)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ishland/GarageProxy/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ishland/GarageProxy/?branch=master)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/ishland/GarageProxy/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 
 Develop
 
 [![Build Status](https://travis-ci.org/ishland/GarageProxy.svg?branch=develop)](https://travis-ci.org/ishland/GarageProxy)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ishland/GarageProxy/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ishland/GarageProxy/?branch=master)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/ishland/GarageProxy/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 
 Super Develop
 
 [![Build Status](https://travis-ci.org/ishland/GarageProxy.svg?branch=super-develop)](https://travis-ci.org/ishland/GarageProxy)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ishland/GarageProxy/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ishland/GarageProxy/?branch=master)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/ishland/GarageProxy/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 
 ## Git repositories
 - Github (Main repository): https://github.com/ishland/GarageProxy
