@@ -21,7 +21,14 @@ Super Develop
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/ishland/GarageProxy/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 
 ## Git repositories
+
+#### Note: Only main repository allows Pull Requests.
+
+### Main repository
 - Github (Main repository): https://github.com/ishland/GarageProxy
+
+### Mirror repository
+- Github (In Organization "gutty-club"): https://github.com/gutty-club/GarageProxy
 - BitBucket: https://bitbucket.org/ishland/garageproxy
 - GitLab: https://gitlab.com/ishland/GarageProxy
 - Gitee: https://gitee.com/ishland/GarageProxy
@@ -39,3 +46,4 @@ https://discordapp.com/invite/Py4an4g
 - Download all the files to your server.
 - Run `php build.php build normal`
 - The phar files will be in "target" directory.
+
