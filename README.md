@@ -46,4 +46,3 @@ https://discordapp.com/invite/Py4an4g
 - Download all the files to your server.
 - Run `php build.php build normal`
 - The phar files will be in "target" directory.
-
