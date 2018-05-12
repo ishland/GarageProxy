@@ -37,6 +37,9 @@ Super Develop
 ## Our Discord Server
 https://discordapp.com/invite/Py4an4g
 
+## Jenkins
+http://116.85.29.250:8080/job/GarageProxy/
+
 ## Requirements
 - PHP 5.3 or higher
 - A POSIX compatible operating system (Linux, OSX, BSD)
