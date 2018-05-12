@@ -150,7 +150,10 @@ function copyfile($src, $dst){
 function deldir($dir){
     //echo "Deleting dir\t{$dir}\n";
     if(!is_dir($dir)) return;
-    if(count(scandir($dir))==2){rmdir($dir);return;}
+    if(count(scandir($dir))==2){
+        rmdir($dir);
+        return;
+    }
     $dh = opendir($dir);
     while($file=readdir($dh)) {
         if($file != '.' && $file != '..') {
