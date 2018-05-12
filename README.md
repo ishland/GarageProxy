@@ -27,7 +27,11 @@ Super Develop
 ### Main repository
 - Github (Main repository): https://github.com/ishland/GarageProxy
 
+<<<<<<< HEAD
 ### Mirror repository
+=======
+### Mirror repository (It will update in a few minutes)
+>>>>>>> super-develop
 - Github (In Organization "gutty-club"): https://github.com/gutty-club/GarageProxy
 - BitBucket: https://bitbucket.org/ishland/garageproxy
 - GitLab: https://gitlab.com/ishland/GarageProxy
@@ -46,4 +50,3 @@ https://discordapp.com/invite/Py4an4g
 - Download all the files to your server.
 - Run `php build.php build normal`
 - The phar files will be in "target" directory.
-
