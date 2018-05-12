@@ -27,11 +27,7 @@ Super Develop
 ### Main repository
 - Github (Main repository): https://github.com/ishland/GarageProxy
 
-<<<<<<< HEAD
-### Mirror repository
-=======
 ### Mirror repository (It will update in a few minutes)
->>>>>>> super-develop
 - Github (In Organization "gutty-club"): https://github.com/gutty-club/GarageProxy
 - BitBucket: https://bitbucket.org/ishland/garageproxy
 - GitLab: https://gitlab.com/ishland/GarageProxy
