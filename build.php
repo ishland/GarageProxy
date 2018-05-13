@@ -68,7 +68,7 @@ function checkEverything(){
         $errCount++;
     }
     echo "\r[    " . process() . "   ] Checking writing...\r";
-    $i = 10000;
+    $i = 1;
     while($i > 0){
         $file = fopen("./.tmp", "a");
         if(!$file) break;
@@ -85,7 +85,7 @@ function checkEverything(){
         $errCount++;
     }
     echo "\r[    " . process() . "   ] Checking reading...\r";
-    $i = 10000;
+    $i = 1;
     while($i > 0){
         file_get_contents("./.tmp");
         $i--;
@@ -150,10 +150,7 @@ function copyfile($src, $dst){
 function deldir($dir){
     //echo "Deleting dir\t{$dir}\n";
     if(!is_dir($dir)) return;
-    if(count(scandir($dir))==2){
-        rmdir($dir);
-        return;
-    }
+    if(count(scandir($dir))==2){rmdir($dir);return;}
     $dh = opendir($dir);
     while($file=readdir($dh)) {
         if($file != '.' && $file != '..') {
@@ -195,7 +192,7 @@ if($argv[1] == "build"){
         system("git clone https://github.com/walkor/Workerman.git cache");
         echo "Done.\n";
         case "cached":
-        echo "Checking if there are some syntax errors.\n";
+        echo "Checking if there are some grammer errors.\n";
         checkFiles();
         if($fileErrors > 0) exit(2);
         echo "Deleting the last build files...\n";
