@@ -1,5 +1,7 @@
 #!/usr/bin/php
 <?php
+$unstable = true;
+
 $process = 0;
 $fileErrors = 0;
 function process(){
@@ -218,7 +220,7 @@ if($argv[1] == "build"){
         makephar(__DIR__ . "/tmp", "./target/GarageProxyClient.phar", "start.php");
         deldir("./tmp");
         echo "Done.\n";
-        exit(0);
+        if(!$unstable) exit(0); else exit(300);
     }
 }
 echo $usage;
