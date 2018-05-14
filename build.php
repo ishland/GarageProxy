@@ -1,7 +1,5 @@
 #!/usr/bin/php
 <?php
-$unstable = true;
-
 $process = 0;
 $fileErrors = 0;
 function process(){
