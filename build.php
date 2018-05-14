@@ -220,7 +220,7 @@ if($argv[1] == "build"){
         makephar(__DIR__ . "/tmp", "./target/GarageProxyClient.phar", "start.php");
         deldir("./tmp");
         echo "Done.\n";
-        if(!$unstable) exit(0); else exit(255);
+        exit(0);
     }
 }
 echo $usage;
