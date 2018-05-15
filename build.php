@@ -40,7 +40,6 @@ function checkEverything(){
         $errCount++;
     }
     $file = fopen("./.tmp", "a");
-    if(!$file) break;
     if(!fputs($file, ".")){
         echo "[  Error ] Writing failed.            \n";
         $errCount++;
