@@ -1,6 +1,5 @@
 <?php
-//This is the configration of GarageProxy.
-
+// This is the configration of GarageProxy.
 define('CONFIG', Array(
     'workers' => Array(
         Array(

@@ -11,8 +11,8 @@ require_once __DIR__ . '/class/PortChecker.php';
 Worker::$stdoutFile = getcwd() . '/logs/latest.log';
 Worker::$pidFile = getcwd() . '/.pid';
 Worker::$logFile = getcwd() . '/logs/workerman.log';
-TcpConnection::$defaultMaxSendBufferSize = 256*1024*1024;
-TcpConnection::$maxPackageSize = 256*1024*1024;
+TcpConnection::$defaultMaxSendBufferSize = 256 * 1024 * 1024;
+TcpConnection::$maxPackageSize = 256 * 1024 * 1024;
 $workerid = 0;
 
 checkEverything();
