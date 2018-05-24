@@ -4,68 +4,64 @@ use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Connection\TcpConnection;
 use Workerman\Lib\Timer;
 
-function checkEverything ()
-{
+function checkEverything(){
     $errCount = 0;
-    if (strstr(PHP_OS, "WIN")) {
+    if(strstr(PHP_OS, "WIN")){
         echo "[  Fatal ] Operating System is Windows.\n";
         exit(1);
     }
     $phpver = substr(phpversion(), 0, 3);
-    if ($phpver < 5.3) {
+    if($phpver < 5.3){
         echo "[  Fatal ] PHP version {$phpver} < 5.3.\n";
         exit(1);
     }
-    if (! extension_loaded("posix")) {
+    if(!extension_loaded("posix")){
         echo "[  Error ] PHP Module Posix could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! extension_loaded("pcntl")) {
+    if(!extension_loaded("pcntl")){
         echo "[  Error ] PHP Module Pcntl could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! extension_loaded("Phar")) {
+    if(!extension_loaded("Phar")){
         echo "[  Error ] PHP Module Phar could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! extension_loaded("sockets")) {
+    if(!extension_loaded("sockets")){
         echo "[  Error ] PHP Module Sockets could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! exec("git")) {
+    if(!exec("git")){
         echo "[  Error ] \"git\" command is not available.\n";
-        $errCount ++;
+        $errCount++;
     }
     $file = fopen("./.tmp", "a");
-    if (! fputs($file, ".")) {
+    if(!fputs($file, ".")){
         echo "[  Error ] Writing failed.            \n";
-        $errCount ++;
+        $errCount++;
     }
     fclose($file);
-    if (! file_get_contents("./.tmp")) {
+    if(!file_get_contents("./.tmp")){
         echo "[  Error ] Reading failed.            \n";
-        $errCount ++;
+        $errCount++;
     }
     unlink("./.tmp");
-    // finish
-    if ($errCount == 0) {
+    //finish
+    if($errCount == 0){
         echo "\r[   OK   ] Finished with no errors! Continue.\n";
     } else {
         echo "\r[  Error ] Finished with {$errCount} errors. Please fix them and try again.\n";
         exit(1);
     }
 }
-
-function allocatePorts ()
+function allocatePorts()
 {
     global $masterport;
     $check = new PortChecker();
-    while (true) {
+    while(true){
         $masterport = rand(40000, 65535);
-        echo "[" . date('Y-m-d H:i:s') .
-                 "][Main][Init][Info] Allocating port {$masterport} to master... ";
-        if ($check->check("127.0.0.1", $masterport) == 1 &&
-                 $check->check("127.0.0.1", $masterport) == 0) {
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Allocating port {$masterport} to master... ";
+        if($check->check("127.0.0.1", $masterport) == 1 && $check->check("127.0.0.1", $masterport) == 0){
             echo "failed.\n";
             continue;
         }
@@ -73,84 +69,64 @@ function allocatePorts ()
         break;
     }
 }
-
-function loadConfig ()
+function loadConfig()
 {
     if (! file_exists(getcwd() . "/config.php")) {
-        echo "[" . date('Y-m-d H:i:s') .
-                 "][Main][Init][Info] Configration not found, create one.\n";
-        file_put_contents(getcwd() . "/config.php",
-                file_get_contents(__DIR__ . "/defaults/config.php"));
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\n";
+        file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
     $config = CONFIG; // For older than 5.4 versions
-    if ($config["settings"]["mode"] == 1) {
-        foreach ($config["workers"] as $arr) {
+    if($config["settings"]["mode"] == 1){
+        foreach($config["workers"] as $arr){
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
         }
     } else {
-        echo "[" . date('Y-m-d H:i:s') .
-                 "][Main][Init][Warn] Configuration is not vaild! Mode is invaild! Using mode 1.";
-        foreach ($config["workers"] as $arr) {
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Warn] Configuration is not vaild! Mode is invaild! Using mode 1.";
+        foreach($config["workers"] as $arr){
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
         }
     }
 }
 
-function setWorker ($listening, $remote, $workers)
+function setWorker($listening, $remote, $workers)
 {
     global $workerid;
     $workerid = $workerid + 1;
     global $$workerid;
-    echo "[" . date('Y-m-d H:i:s') .
-             "][Main][Init][Info] Setting up Worker-{$workerid}...\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Setting up Worker-{$workerid}...\n";
     if (! $listening or ! $remote or ! $workers) {
-        echo "[" . date('Y-m-d H:i:s') .
-                 "][Main][Init][Error] Configuration is not vaild! While setting up Worker-{$workerid}!";
-        echo "[" . date('Y-m-d H:i:s') .
-                 "][Main][Init][Error] Configuration of Worker-{$workerid} has failed!";
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Error] Configuration is not vaild! While setting up Worker-{$workerid}!";
+        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Error] Configuration of Worker-{$workerid} has failed!";
         return false;
     }
-    echo "[" . date('Y-m-d H:i:s') .
-             "][Main][Init][Debug] The settings of Worker-{$workerid} is:\n";
-    echo "[" . date('Y-m-d H:i:s') .
-             "][Main][Init][Debug] Worker count: {$workers}\n";
-    echo "[" . date('Y-m-d H:i:s') .
-             "][Main][Init][Debug] Forwarding: {$listening} -> {$remote}\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] The settings of Worker-{$workerid} is:\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Worker count: {$workers}\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Forwarding: {$listening} -> {$remote}\n";
     $$workerid = new Worker($listening);
     $$workerid->count = $workers;
     $$workerid->name = "worker" . $workerid;
     $$workerid->listening = $listening;
     $$workerid->remote = $remote;
     $$workerid->proxyid = $workerid;
-    $$workerid->onWorkerStart = function ($worker)
-    {
+    $$workerid->onWorkerStart = function ($worker) {
         onWorkerStart($worker);
     };
     $$workerid->onConnect = 'onConnect';
-    echo "[" . date('Y-m-d H:i:s') .
-             "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\n";
+    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\n";
 }
 
-function onWorkerStart ($worker)
+function onWorkerStart($worker)
 {
     sleep(1);
     global $conn_to_master, $masterport;
     $conn_to_master = new AsyncTcpConnection("tcp://127.0.0.1:" . $masterport);
-    $conn_to_master->onClose = function ($connection) use ( $worker)
-    {
+    $conn_to_master->onClose = function ($connection) use ($worker){
         global $ADDRESS, $global_uid, $workerid;
         $connection->reConnect();
-        $connection->send(
-                json_encode(
-                        Array(
-                                "action" => "reconn",
-                                "worker" => $worker->id + 1,
-                                "proxy" => $worker->proxyid
-                        )));
+        $connection->send(json_encode(Array("action" => "reconn", "worker" => $worker->id + 1, "proxy" => $worker->proxyid)));
     };
-    $conn_to_master->onError = function ($connection_to_server)
-    {
+    $conn_to_master->onError = function ($connection_to_server) {
         $connection_to_server->close();
     };
     $conn_to_master->connect();
@@ -159,17 +135,10 @@ function onWorkerStart ($worker)
     $global_uid = 0;
     $ADDRESS = $worker->remote;
     $workerid = $worker->proxyid;
-    $conn_to_master->send(
-            json_encode(
-                    Array(
-                            "action" => "new",
-                            "worker" => $worker->id + 1,
-                            "proxy" => $worker->proxyid
-                    )));
-}
-;
+    $conn_to_master->send(json_encode(Array("action" => "new", "worker" => $worker->id + 1, "proxy" => $worker->proxyid)));
+};
 
-function onConnect ($connection)
+function onConnect($connection)
 {
     global $workerid, $ADDRESS, $global_uid;
     global $$workerid;
@@ -179,104 +148,43 @@ function onConnect ($connection)
     $connection->proxyid = $$workerid->proxyid;
     $connection->compression = false;
     $connection->firstmsg = true;
-    $conn_to_master->send(
-            json_encode(
-                    Array(
-                            "action" => "new_conn",
-                            "ip" => $connection->getRemoteIp(),
-                            "port" => $connection->getRemotePort(),
-                            "uid" => $connection->uid
-                    )));
+    $conn_to_master->send(json_encode(Array("action" => "new_conn", "ip" => $connection->getRemoteIp(), "port" => $connection->getRemotePort(), "uid" => $connection->uid)));
     $connection_to_server = new AsyncTcpConnection($ADDRESS);
-    $connection_to_server->onMessage = function ($connection_to_server, $buffer) use ( 
-    $connection)
-    {
+    $connection_to_server->onMessage = function ($connection_to_server, $buffer) use ($connection) {
         global $conn_to_master;
-        if ($connection->compression) {
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "in",
-                                    "strlen" => strlen($buffer),
-                                    "uid" => $connection->uid
-                            )));
+        if($connection->compression){
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
             $compressed = gzdeflate($buffer, 9);
             $connection->send($compressed);
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "out",
-                                    "strlen" => strlen($compressed),
-                                    "uid" => $connection->uid
-                            )));
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($compressed), "uid" => $connection->uid)));
             return;
         }
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "new_msg",
-                                "handle" => "in",
-                                "strlen" => strlen($buffer),
-                                "uid" => $connection->uid
-                        )));
+        $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
         $connection->send($buffer);
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "new_msg",
-                                "handle" => "out",
-                                "strlen" => strlen($buffer),
-                                "uid" => $connection->uid
-                        )));
+        $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($buffer), "uid" => $connection->uid)));
     };
-    $connection_to_server->onClose = function ($connection_to_server) use ( 
-    $connection)
-    {
+    $connection_to_server->onClose = function ($connection_to_server) use ($connection) {
         $connection->close();
     };
-    $connection_to_server->onError = function ($connection_to_server, $errcode,
-            $errmsg) use ( $connection)
-    {
+    $connection_to_server->onError = function ($connection_to_server, $errcode, $errmsg) use ($connection) {
         $connection->close();
     };
-    $connection_to_server->onBufferFull = function ($connection_to_server) use ( 
-    $connection)
-    {
+    $connection_to_server->onBufferFull = function ($connection_to_server) use ($connection){
         $connection_to_server->pauseRecv();
     };
-    $connection_to_server->onBufferDrain = function ($connection_to_server) use ( 
-    $connection)
-    {
+    $connection_to_server->onBufferDrain = function ($connection_to_server) use ($connection){
         $connection_to_server->resumeRecv();
     };
     
     $connection_to_server->connect();
     
-    $connection->onMessage = function ($connection, $buffer) use ( 
-    $connection_to_server)
-    {
+    $connection->onMessage = function ($connection, $buffer) use ($connection_to_server) {
         global $conn_to_master;
-        if ($connection->firstmsg) {
-            if (substr($buffer, 0, 17) !== "GarageProxyClient") {
-                $conn_to_master->send(
-                        json_encode(
-                                Array(
-                                        "action" => "new_msg",
-                                        "handle" => "in",
-                                        "strlen" => strlen($buffer),
-                                        "uid" => $connection->uid
-                                )));
+        if($connection->firstmsg){
+            if(substr($buffer, 0, 17) !== "GarageProxyClient"){
+                $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
                 $connection_to_server->send($buffer);
-                $conn_to_master->send(
-                        json_encode(
-                                Array(
-                                        "action" => "new_msg",
-                                        "handle" => "out",
-                                        "strlen" => strlen($buffer),
-                                        "uid" => $connection->uid
-                                )));
+                $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($buffer), "uid" => $connection->uid)));
                 $connection->firstmsg = false;
                 return;
             }
@@ -284,92 +192,35 @@ function onConnect ($connection)
             $connection->compression = $arr['compression'];
             $connection->firstmsg = false;
             $connection->send("GarageProxy-OK");
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "in",
-                                    "strlen" => strlen($buffer),
-                                    "uid" => $connection->uid
-                            )));
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
             return;
         }
-        if ($connection->compression) {
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "in",
-                                    "strlen" => strlen($buffer),
-                                    "uid" => $connection->uid
-                            )));
+        if($connection->compression){
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
             $uncompressed = gzinflate($buffer);
             $connection_to_server->send($uncompressed);
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "out",
-                                    "strlen" => strlen($uncompressed),
-                                    "uid" => $connection->uid
-                            )));
+            $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($uncompressed), "uid" => $connection->uid)));
             return;
         }
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "new_msg",
-                                "handle" => "in",
-                                "strlen" => strlen($buffer),
-                                "uid" => $connection->uid
-                        )));
+        $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "in", "strlen" => strlen($buffer), "uid" => $connection->uid)));
         $connection_to_server->send($buffer);
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "new_msg",
-                                "handle" => "out",
-                                "strlen" => strlen($buffer),
-                                "uid" => $connection->uid
-                        )));
+        $conn_to_master->send(json_encode(Array("action" => "new_msg", "handle" => "out", "strlen" => strlen($buffer), "uid" => $connection->uid)));
         $connection->firstmsg = false;
     };
-    $connection->onClose = function ($connection) use ( $connection_to_server)
-    {
+    $connection->onClose = function ($connection) use ($connection_to_server) {
         global $conn_to_master;
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "close_conn",
-                                "ip" => $connection->getRemoteIp(),
-                                "port" => $connection->getRemotePort(),
-                                "uid" => $connection->uid
-                        )));
+        $conn_to_master->send(json_encode(Array("action" => "close_conn", "ip" => $connection->getRemoteIp(), "port" => $connection->getRemotePort(), "uid" => $connection->uid)));
         $connection_to_server->close();
     };
-    $connection->onError = function ($connection, $errcode, $errormsg) use ( 
-    $connection_to_server)
-    {
+    $connection->onError = function ($connection, $errcode, $errormsg) use ($connection_to_server) {
         global $conn_to_master;
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "close_conn",
-                                "ip" => $connection->getRemoteIp(),
-                                "port" => $connection->getRemotePort(),
-                                "uid" => $connection->uid
-                        )));
+        $conn_to_master->send(json_encode(Array("action" => "close_conn", "ip" => $connection->getRemoteIp(), "port" => $connection->getRemotePort(), "uid" => $connection->uid)));
         $connection_to_server->close();
     };
-    $connection->onBufferFull = function ($connection) use ( 
-    $connection_to_server)
-    {
+    $connection->onBufferFull = function ($connection) use ($connection_to_server){
         $connection->pauseRecv();
     };
-    $connection->onBufferDrain = function ($connection) use ( 
-    $connection_to_server)
-    {
+    $connection->onBufferDrain = function ($connection) use ($connection_to_server){
         $connection->resumeRecv();
     };
-}
-;
+};

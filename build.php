@@ -1,135 +1,117 @@
 #!/usr/bin/php
 <?php
 $fileErrors = 0;
-
-function makephar ($dir, $name, $default)
-{
+function makephar($dir, $name, $default){
     @unlink($name);
     $phar = new Phar($name);
-    if (! $phar)
-        exit(
-                "[Fatal Error] Error while making phar. Please ensure that phar.readonly is disabled in php.ini.\n");
+    if(!$phar) exit("[Fatal Error] Error while making phar. Please ensure that phar.readonly is disabled in php.ini.\n");
     $phar->buildFromDirectory($dir);
     $phar->setDefaultStub($default, null);
 }
-
-function checkEverything ()
-{
+function checkEverything(){
     $errCount = 0;
-    if (strstr(PHP_OS, "WIN")) {
+    if(strstr(PHP_OS, "WIN")){
         echo "[  Fatal ] Operating System is Windows.\n";
         exit(1);
     }
     $phpver = substr(phpversion(), 0, 3);
-    if ($phpver < 5.3) {
+    if($phpver < 5.3){
         echo "[  Fatal ] PHP version {$phpver} < 5.3.\n";
         exit(1);
     }
-    if (! extension_loaded("posix")) {
+    if(!extension_loaded("posix")){
         echo "[  Error ] PHP Module Posix could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! extension_loaded("pcntl")) {
+    if(!extension_loaded("pcntl")){
         echo "[  Error ] PHP Module Pcntl could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! extension_loaded("Phar")) {
+    if(!extension_loaded("Phar")){
         echo "[  Error ] PHP Module Phar could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! extension_loaded("sockets")) {
+    if(!extension_loaded("sockets")){
         echo "[  Error ] PHP Module Sockets could not found.\n";
-        $errCount ++;
+        $errCount++;
     }
-    if (! exec("git")) {
+    if(!exec("git")){
         echo "[  Error ] \"git\" command is not available.\n";
-        $errCount ++;
+        $errCount++;
     }
     $file = fopen("./.tmp", "a");
-    if (! fputs($file, ".")) {
+    if(!fputs($file, ".")){
         echo "[  Error ] Writing failed.            \n";
-        $errCount ++;
+        $errCount++;
     }
     fclose($file);
-    if (! file_get_contents("./.tmp")) {
+    if(!file_get_contents("./.tmp")){
         echo "[  Error ] Reading failed.            \n";
-        $errCount ++;
+        $errCount++;
     }
     unlink("./.tmp");
-    // finish
-    if ($errCount == 0) {
+    //finish
+    if($errCount == 0){
         echo "\r[   OK   ] Finished with no errors! Continue.\n";
     } else {
         echo "\r[  Error ] Finished with {$errCount} errors. Please fix them and try again.\n";
         exit(1);
     }
 }
-
-function checkFiles ($src = "./main")
-{
+function checkFiles($src = "./main"){
     global $fileErrors;
     $dir = opendir($src);
-    while (($file = readdir($dir)) !== false) {
-        if (($file != '.') && ($file != '..')) {
-            if (is_dir($src . '/' . $file)) {
-                checkFiles($src . '/' . $file);
-            } else {
+    while(($file = readdir($dir)) !== false) { 
+        if(($file != '.') && ($file != '..')) { 
+            if(is_dir($src . '/' . $file)) { 
+                checkFiles($src . '/' . $file); 
+            } else { 
                 $result = exec("php -l " . $src . '/' . $file);
-                if (strchr($result, "Errors parsing")) {
-                    $fileErrors ++;
+                if(strchr($result, "Errors parsing")){
+                    $fileErrors++;
                     echo "[Error] Parsing error, the script will exit.\n";
                 }
                 echo $result . "\n";
-            }
-        }
-    }
-    closedir($dir);
+            } 
+        } 
+    } 
+   closedir($dir);
 }
-
-function copydir ($src, $dst)
-{
-    // echo "Copying dir\t{$src}...\n";
+function copydir($src, $dst){ 
+    //echo "Copying dir\t{$src}...\n";
     $dir = opendir($src);
     @mkdir($dst);
-    while (($file = readdir($dir)) !== false) {
-        if (($file != '.') && ($file != '..')) {
-            if (is_dir($src . '/' . $file)) {
-                copydir($src . '/' . $file, $dst . '/' . $file);
-            } else {
-                // echo "Copying file\t" . $src . '/' . $file . "\n";
-                copy($src . '/' . $file, $dst . '/' . $file);
-            }
-        }
-    }
-    closedir($dir);
+    while(($file = readdir($dir)) !== false) { 
+        if(($file != '.') && ($file != '..')) { 
+            if(is_dir($src . '/' . $file)) { 
+                copydir($src . '/' . $file, $dst . '/' . $file); 
+            } else { 
+                //echo "Copying file\t" . $src . '/' . $file . "\n";
+                copy($src . '/' . $file, $dst . '/' . $file); 
+            } 
+        } 
+    } 
+   closedir($dir); 
 }
-
-function copyfile ($src, $dst)
-{
-    // echo "Copying file\t{$src}\n";
+function copyfile($src, $dst){
+    //echo "Copying file\t{$src}\n";
     copy($src, $dst);
-    // echo "\n";
+    //echo "\n";
 }
-
-function deldir ($dir)
-{
-    // echo "Deleting dir\t{$dir}\n";
-    if (! is_dir($dir))
-        return;
-    if (count(scandir($dir)) == 2) {
-        rmdir($dir);
-        return;
-    }
+function deldir($dir){
+    //echo "Deleting dir\t{$dir}\n";
+    if(!is_dir($dir)) return;
+    if(count(scandir($dir))==2){rmdir($dir);return;}
     $dh = opendir($dir);
-    while ($file = readdir($dh)) {
-        if ($file != '.' && $file != '..') {
+    while($file=readdir($dh)) {
+        if($file != '.' && $file != '..') {
             $fullpath = $dir . "/" . $file;
-            if (is_file($fullpath)) {
-                // echo "Deleting file\t{$fullpath}\n";
+            if(is_file($fullpath)) {
+                //echo "Deleting file\t{$fullpath}\n";
                 unlink($fullpath);
-            }
-            if (is_dir($fullpath)) {
-                if (count(scandir($fullpath)) == 2) {
+            } 
+            if(is_dir($fullpath)){
+                if(count(scandir($fullpath))==2){
                     rmdir($fullpath);
                 } else {
                     deldir($fullpath);
@@ -137,60 +119,57 @@ function deldir ($dir)
             }
         }
     }
-    
+ 
     closedir($dh);
-    if (rmdir($dir)) {
+    if(rmdir($dir)) {
         return true;
     } else {
         return false;
     }
 }
 $usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete cached files and download it.)\n\tcached\tUse cached files to build.\n";
-if ($argv[1] == "build") {
-    if (! $argv[2]) {
+if($argv[1] == "build"){
+    if(!$argv[2]){
         echo $usage;
         exit(1);
     }
     echo "Checking everything...\n";
     checkEverything();
-    switch ($argv[2]) {
+    switch($argv[2]){
         case "normal":
-            @mkdir("cache");
-            echo "Downloading workerman...\n";
-            deldir("./cache");
-            system("git clone https://github.com/walkor/Workerman.git cache");
-            echo "Done.\n";
+        @mkdir("cache");
+        echo "Downloading workerman...\n";
+        deldir("./cache");
+        system("git clone https://github.com/walkor/Workerman.git cache");
+        echo "Done.\n";
         case "cached":
-            echo "Checking if there are some grammer errors.\n";
-            checkFiles();
-            if ($fileErrors > 0)
-                exit(2);
-            echo "Deleting the last build files...\n";
-            @mkdir("tmp");
-            deldir("./tmp");
-            echo "Building...\n";
-            echo "Building server side...\n";
-            @mkdir("tmp");
-            echo "Copying files...\n";
-            copydir("./cache", "./tmp");
-            copydir("./main/server-side", "./tmp");
-            echo "Making phar file...\n";
-            @mkdir("target");
-            makephar(__DIR__ . "/tmp", "./target/GarageProxyServer.phar",
-                    "launcher.php");
-            echo "Done.\n";
-            echo "Building client side...\n";
-            deldir("./tmp");
-            @mkdir("tmp");
-            echo "Copying files...\n";
-            copydir("./cache", "./tmp");
-            copydir("./main/client-side", "./tmp");
-            echo "Making phar file...\n";
-            makephar(__DIR__ . "/tmp", "./target/GarageProxyClient.phar",
-                    "start.php");
-            deldir("./tmp");
-            echo "Done.\n";
-            exit(0);
+        echo "Checking if there are some grammer errors.\n";
+        checkFiles();
+        if($fileErrors > 0) exit(2);
+        echo "Deleting the last build files...\n";
+        @mkdir("tmp");
+        deldir("./tmp");
+        echo "Building...\n";
+        echo "Building server side...\n";
+        @mkdir("tmp");
+        echo "Copying files...\n";
+        copydir("./cache", "./tmp");
+        copydir("./main/server-side", "./tmp");
+        echo "Making phar file...\n";
+        @mkdir("target");
+        makephar(__DIR__ . "/tmp", "./target/GarageProxyServer.phar", "launcher.php");
+        echo "Done.\n";
+        echo "Building client side...\n";
+        deldir("./tmp");
+        @mkdir("tmp");
+        echo "Copying files...\n";
+        copydir("./cache", "./tmp");
+        copydir("./main/client-side", "./tmp");
+        echo "Making phar file...\n";
+        makephar(__DIR__ . "/tmp", "./target/GarageProxyClient.phar", "start.php");
+        deldir("./tmp");
+        echo "Done.\n";
+        exit(0);
     }
 }
 echo $usage;
