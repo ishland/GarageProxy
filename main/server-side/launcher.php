@@ -11,8 +11,8 @@ require_once __DIR__ . '/class/PortChecker.php';
 Worker::$stdoutFile = getcwd() . '/logs/latest.log';
 Worker::$pidFile = getcwd() . '/.pid';
 Worker::$logFile = getcwd() . '/logs/workerman.log';
-TcpConnection::$defaultMaxSendBufferSize = 256*1024*1024;
-TcpConnection::$maxPackageSize = 256*1024*1024;
+TcpConnection::$defaultMaxSendBufferSize = 256 * 1024 * 1024;
+TcpConnection::$maxPackageSize = 256 * 1024 * 1024;
 $workerid = 0;
 
 checkEverything();
@@ -24,9 +24,12 @@ echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Reading Settings...\n";
 
 loadConfig();
 
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration has completed.\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializtion has completed.\n";
-echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] Launching Workerman...\n";
+echo "[" . date('Y-m-d H:i:s') .
+         "][Main][Init][Info] Configuration has completed.\n";
+echo "[" . date('Y-m-d H:i:s') .
+         "][Main][Init][Info] Initializtion has completed.\n";
+echo "[" . date('Y-m-d H:i:s') .
+         "][Main][Startup][Info] Launching Workerman...\n";
 echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] ";
 
 Worker::runAll();
