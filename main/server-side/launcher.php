@@ -30,4 +30,4 @@ echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializtion has complete
 echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] Launching Workerman...\n";
 echo "[" . date('Y-m-d H:i:s') . "][Main][Startup][Info] ";
 
-Worker::runAll();
+Worker::runAll()
