@@ -1,6 +1,6 @@
 <?php
 // This is the configration of GarageProxy.
-define('CONFIG', Array(
+$CONFIG = Array(
     'workers' => Array(
         Array(
             'addr' => "tcp://0.0.0.0:12345",
@@ -16,4 +16,4 @@ define('CONFIG', Array(
     'settings' => Array(
         'mode' => 1
     )
-));
+);
