@@ -74,12 +74,13 @@ function allocatePorts()
 
 function loadConfig()
 {
+    global $CONFIG;
     if (! file_exists(getcwd() . "/config.php")) {
         echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\n";
         file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
-    $config = CONFIG; // For older than 5.4 versions
+    $config = $CONFIG; // For older than 5.4 versions
     if ($config["settings"]["mode"] == 1) {
         foreach ($config["workers"] as $arr) {
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
