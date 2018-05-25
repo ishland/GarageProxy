@@ -4,6 +4,7 @@ php:
   - 7.1
 script: 
   - php build.php build normal
+  - mkdir test
   - cp ./target/GarageProxyServer.phar ./test/
   - cd test
   - php GarageProxyServer.phar start -d
