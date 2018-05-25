@@ -7,6 +7,7 @@ use Workerman\Lib\Timer;
 require_once __DIR__ . '/Autoloader.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/class/PortChecker.php';
+require_once __DIR__ . '/workers/ProxyWorker.php';
 @mkdir(getcwd() . "/logs");
 Worker::$stdoutFile = getcwd() . '/logs/latest.log';
 Worker::$pidFile = getcwd() . '/.pid';
