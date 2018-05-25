@@ -4,12 +4,12 @@ define('CONFIG', Array(
     'workers' => Array(
         Array(
             'addr' => "tcp://0.0.0.0:12345",
-            'remote' => "tcp://www.google.com",
+            'remote' => "tcp://minecraft.net:443",
             'processes' => 6
         ),
         Array(
             'addr' => "tcp://0.0.0.0:12346",
-            'remote' => "tcp://www.youtube.com",
+            'remote' => "tcp://minecraft.net:443",
             'processes' => 6
         )
     ),
