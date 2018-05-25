@@ -112,8 +112,14 @@ function setWorker($listening, $remote, $workers)
     $$workerid->listening = $listening;
     $$workerid->remote = $remote;
     $$workerid->proxyid = $workerid;
-    $$workerid->onWorkerStart = array(new ProxyWorker, 'onWorkerStart');
-    $$workerid->onConnect = array(new ProxyWorker, 'onConnectMode1');
+    $$workerid->onWorkerStart = array(
+        new ProxyWorker(),
+        'onWorkerStart'
+    );
+    $$workerid->onConnect = array(
+        new ProxyWorker(),
+        'onConnectMode1'
+    );
     echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\n";
 }
 
