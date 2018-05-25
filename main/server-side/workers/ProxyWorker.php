@@ -4,7 +4,7 @@ use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Connection\TcpConnection;
 use Workerman\Lib\Timer;
 
-class ProxyWorker() {
+class ProxyWorker {
     public function onWorkerStart($worker)
     {
         sleep(1);
@@ -191,5 +191,4 @@ class ProxyWorker() {
             $connection->resumeRecv();
         };
     }
-    ;
 }
