@@ -4,7 +4,7 @@ define('CONFIG', Array(
     'workers' => Array(
         Array(
             'addr' => "tcp://0.0.0.0:12345",
-            'remote' => "tcp://minecraft.net:443",
+            'remote' => "tcp://www.baidu.com:443",
             'processes' => 6
         ),
         Array(
