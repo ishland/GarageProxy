@@ -1,3 +1,6 @@
+v0.3-dev.6 Updates
+* Format codes
++ Main worker moved to a file.
 v0.3-dev.5 Updates
 + Fixes checkEverything()
 v0.3-dev.4 Updates
