@@ -44,13 +44,13 @@ function checkEverything()
         echo "[  Error ] \"git\" command is not available.\n";
         $errCount ++;
     }
-    $file = fopen("./.tmp", "a");
+    $file = fopen("./.write", "a");
     if (! fputs($file, ".")) {
         echo "[  Error ] Writing failed.            \n";
         $errCount ++;
     }
     fclose($file);
-    if (! file_get_contents("./.tmp")) {
+    if (! file_get_contents("./write")) {
         echo "[  Error ] Reading failed.            \n";
         $errCount ++;
     }
@@ -144,7 +144,7 @@ function deldir($dir)
         return false;
     }
 }
-$usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete cached files and download it.)\n\tcached\tUse cached files to build.\n";
+$usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete .cached files and download it.)\n\t.cached\tUse .cached files to build.\n";
 if ($argv[1] == "build") {
     if (! $argv[2]) {
         echo $usage;
@@ -154,38 +154,38 @@ if ($argv[1] == "build") {
     checkEverything();
     switch ($argv[2]) {
         case "normal":
-            @mkdir("cache");
+            @mkdir(".cache");
             echo "Downloading workerman...\n";
-            deldir("./cache");
-            system("git clone https://github.com/walkor/Workerman.git cache");
+            deldir("./.cache");
+            system("git clone https://github.com/walkor/Workerman.git .cache");
             echo "Done.\n";
-        case "cached":
+        case ".cached":
             echo "Checking if there are some syntax errors.\n";
             checkFiles();
             if ($fileErrors > 0)
                 exit(2);
             echo "Deleting the last build files...\n";
-            @mkdir("tmp");
-            deldir("./tmp");
+            @mkdir(".tmp");
+            deldir("./.tmp");
             echo "Building...\n";
             echo "Building server side...\n";
-            @mkdir("tmp");
+            @mkdir(".tmp");
             echo "Copying files...\n";
-            copydir("./cache", "./tmp");
-            copydir("./main/server-side", "./tmp");
+            copydir("./.cache", "./.tmp");
+            copydir("./main/server-side", "./.tmp");
             echo "Making phar file...\n";
             @mkdir("target");
-            makephar(__DIR__ . "/tmp", "./target/GarageProxyServer.phar", "launcher.php");
+            makephar(__DIR__ . "/.tmp", "./target/GarageProxyServer.phar", "launcher.php");
             echo "Done.\n";
             echo "Building client side...\n";
-            deldir("./tmp");
-            @mkdir("tmp");
+            deldir("./.tmp");
+            @mkdir(".tmp");
             echo "Copying files...\n";
-            copydir("./cache", "./tmp");
+            copydir("./.cache", "./.tmp");
             copydir("./main/client-side", "./tmp");
             echo "Making phar file...\n";
-            makephar(__DIR__ . "/tmp", "./target/GarageProxyClient.phar", "start.php");
-            deldir("./tmp");
+            makephar(__DIR__ . "/.tmp", "./target/GarageProxyClient.phar", "start.php");
+            deldir("./.tmp");
             echo "Done.\n";
             exit(0);
     }
