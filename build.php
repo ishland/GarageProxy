@@ -50,11 +50,11 @@ function checkEverything()
         $errCount ++;
     }
     fclose($file);
-    if (! file_get_contents("./write")) {
+    if (! file_get_contents("./.write")) {
         echo "[  Error ] Reading failed.            \n";
         $errCount ++;
     }
-    unlink("./.tmp");
+    unlink("./.write");
     // finish
     if ($errCount == 0) {
         echo "\r[   OK   ] Finished with no errors! Continue.\n";
