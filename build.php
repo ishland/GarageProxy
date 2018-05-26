@@ -65,19 +65,22 @@ function checkEverything ()
     }
 }
 
-function checkFiles ($src = "./main")
+function syntaxCheck ($src = ".")
 {
     global $fileErrors;
     $dir = opendir($src);
     while (($file = readdir($dir)) !== false) {
         if (($file != '.') && ($file != '..')) {
+            $name = explode(".", $file);
             if (is_dir($src . '/' . $file)) {
-                checkFiles($src . '/' . $file);
+                syntaxCheck($src . '/' . $file);
             } else {
+                if (end($name) !== "php")
+                    continue;
                 $result = exec("php -l " . $src . '/' . $file);
                 if (strchr($result, "Errors parsing")) {
                     $fileErrors ++;
-                    echo "[Error] Parsing error, the script will exit.\n";
+                    echo "[Error] Parsing error.\n";
                 }
                 echo $result . "\n";
             }
@@ -145,7 +148,7 @@ function deldir ($dir)
         return false;
     }
 }
-$usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete .cached files and download it.)\n\t.cached\tUse .cached files to build.\n";
+$usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete .cached files and download it.)\n\tcached\tUse .cached files to build.\n";
 if ($argv[1] == "build") {
     if (! $argv[2]) {
         echo $usage;
@@ -160,9 +163,9 @@ if ($argv[1] == "build") {
             deldir("./.cache");
             system("git clone https://github.com/walkor/Workerman.git .cache");
             echo "Done.\n";
-        case ".cached":
+        case "cached":
             echo "Checking if there are some syntax errors.\n";
-            checkFiles();
+            syntaxCheck();
             if ($fileErrors > 0)
                 exit(2);
             echo "Deleting the last build files...\n";
