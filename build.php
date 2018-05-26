@@ -2,17 +2,18 @@
 <?php
 $fileErrors = 0;
 
-function makephar($dir, $name, $default)
+function makephar ($dir, $name, $default)
 {
     @unlink($name);
     $phar = new Phar($name);
     if (! $phar)
-        exit("[Fatal Error] Error while making phar. Please ensure that phar.readonly is disabled in php.ini.\n");
+        exit(
+                "[Fatal Error] Error while making phar. Please ensure that phar.readonly is disabled in php.ini.\n");
     $phar->buildFromDirectory($dir);
     $phar->setDefaultStub($default, null);
 }
 
-function checkEverything()
+function checkEverything ()
 {
     $errCount = 0;
     if (strstr(PHP_OS, "WIN")) {
@@ -64,7 +65,7 @@ function checkEverything()
     }
 }
 
-function checkFiles($src = "./main")
+function checkFiles ($src = "./main")
 {
     global $fileErrors;
     $dir = opendir($src);
@@ -85,7 +86,7 @@ function checkFiles($src = "./main")
     closedir($dir);
 }
 
-function copydir($src, $dst)
+function copydir ($src, $dst)
 {
     // echo "Copying dir\t{$src}...\n";
     $dir = opendir($src);
@@ -103,14 +104,14 @@ function copydir($src, $dst)
     closedir($dir);
 }
 
-function copyfile($src, $dst)
+function copyfile ($src, $dst)
 {
     // echo "Copying file\t{$src}\n";
     copy($src, $dst);
     // echo "\n";
 }
 
-function deldir($dir)
+function deldir ($dir)
 {
     // echo "Deleting dir\t{$dir}\n";
     if (! is_dir($dir))
@@ -175,7 +176,8 @@ if ($argv[1] == "build") {
             copydir("./main/server-side", "./.tmp");
             echo "Making phar file...\n";
             @mkdir("target");
-            makephar(__DIR__ . "/.tmp", "./target/GarageProxyServer.phar", "launcher.php");
+            makephar(__DIR__ . "/.tmp", "./target/GarageProxyServer.phar",
+                    "launcher.php");
             echo "Done.\n";
             echo "Building client side...\n";
             deldir("./.tmp");
@@ -184,7 +186,8 @@ if ($argv[1] == "build") {
             copydir("./.cache", "./.tmp");
             copydir("./main/client-side", "./tmp");
             echo "Making phar file...\n";
-            makephar(__DIR__ . "/.tmp", "./target/GarageProxyClient.phar", "start.php");
+            makephar(__DIR__ . "/.tmp", "./target/GarageProxyClient.phar",
+                    "start.php");
             deldir("./.tmp");
             echo "Done.\n";
             exit(0);
