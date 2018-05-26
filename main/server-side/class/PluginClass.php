@@ -15,14 +15,14 @@ class PluginClass
 
     public $onPluginDisable = null;
 
-    public function __construct($name, $version)
+    public function __construct ($name, $version)
     {
         global $pluginList;
         $this->name = $name;
         $this->version = $version;
     }
 
-    protected function PluginLoad()
+    protected function PluginLoad ()
     {
         // try to emit onPluginLoad
         if ($this->state == "loaded")

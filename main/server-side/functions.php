@@ -4,7 +4,7 @@ use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Connection\TcpConnection;
 use Workerman\Lib\Timer;
 
-function checkEverything()
+function checkEverything ()
 {
     $errCount = 0;
     if (strstr(PHP_OS, "WIN")) {
@@ -56,14 +56,16 @@ function checkEverything()
     }
 }
 
-function allocatePorts()
+function allocatePorts ()
 {
     global $masterport;
     $check = new PortChecker();
     while (true) {
         $masterport = rand(40000, 65535);
-        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Allocating port {$masterport} to master... ";
-        if ($check->check("127.0.0.1", $masterport) == 1 && $check->check("127.0.0.1", $masterport) == 0) {
+        echo "[" . date('Y-m-d H:i:s') .
+                "][Main][Init][Info] Allocating port {$masterport} to master... ";
+        if ($check->check("127.0.0.1", $masterport) == 1 &&
+                $check->check("127.0.0.1", $masterport) == 0) {
             echo "failed.\n";
             continue;
         }
@@ -72,12 +74,14 @@ function allocatePorts()
     }
 }
 
-function loadConfig()
+function loadConfig ()
 {
     global $CONFIG;
     if (! file_exists(getcwd() . "/config.php")) {
-        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configration not found, create one.\n";
-        file_put_contents(getcwd() . "/config.php", file_get_contents(__DIR__ . "/defaults/config.php"));
+        echo "[" . date('Y-m-d H:i:s') .
+                "][Main][Init][Info] Configration not found, create one.\n";
+        file_put_contents(getcwd() . "/config.php",
+                file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
     $config = $CONFIG; // For older than 5.4 versions
@@ -86,27 +90,34 @@ function loadConfig()
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
         }
     } else {
-        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Warn] Configuration is not vaild! Mode is invaild! Using mode 1.";
+        echo "[" . date('Y-m-d H:i:s') .
+                "][Main][Init][Warn] Configuration is not vaild! Mode is invaild! Using mode 1.";
         foreach ($config["workers"] as $arr) {
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
         }
     }
 }
 
-function setWorker($listening, $remote, $workers)
+function setWorker ($listening, $remote, $workers)
 {
     global $workerid;
     $workerid = $workerid + 1;
     global $$workerid;
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Setting up Worker-{$workerid}...\n";
+    echo "[" . date('Y-m-d H:i:s') .
+            "][Main][Init][Info] Setting up Worker-{$workerid}...\n";
     if (! $listening or ! $remote or ! $workers) {
-        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Error] Configuration is not vaild! While setting up Worker-{$workerid}!";
-        echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Error] Configuration of Worker-{$workerid} has failed!";
+        echo "[" . date('Y-m-d H:i:s') .
+                "][Main][Init][Error] Configuration is not vaild! While setting up Worker-{$workerid}!";
+        echo "[" . date('Y-m-d H:i:s') .
+                "][Main][Init][Error] Configuration of Worker-{$workerid} has failed!";
         return false;
     }
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] The settings of Worker-{$workerid} is:\n";
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Worker count: {$workers}\n";
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Debug] Forwarding: {$listening} -> {$remote}\n";
+    echo "[" . date('Y-m-d H:i:s') .
+            "][Main][Init][Debug] The settings of Worker-{$workerid} is:\n";
+    echo "[" . date('Y-m-d H:i:s') .
+            "][Main][Init][Debug] Worker count: {$workers}\n";
+    echo "[" . date('Y-m-d H:i:s') .
+            "][Main][Init][Debug] Forwarding: {$listening} -> {$remote}\n";
     $$workerid = new Worker($listening);
     $$workerid->count = $workers;
     $$workerid->name = "worker" . $workerid;
@@ -114,13 +125,14 @@ function setWorker($listening, $remote, $workers)
     $$workerid->remote = $remote;
     $$workerid->proxyid = $workerid;
     $$workerid->onWorkerStart = array(
-        new ProxyWorker(),
-        'onWorkerStart'
+            new ProxyWorker(),
+            'onWorkerStart'
     );
     $$workerid->onConnect = array(
-        new ProxyWorker(),
-        'onConnectMode1'
+            new ProxyWorker(),
+            'onConnectMode1'
     );
-    echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\n";
+    echo "[" . date('Y-m-d H:i:s') .
+            "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\n";
 }
 

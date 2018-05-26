@@ -2,17 +2,18 @@
 <?php
 $fileErrors = 0;
 
-function makephar($dir, $name, $default)
+function makephar ($dir, $name, $default)
 {
     @unlink($name);
     $phar = new Phar($name);
     if (! $phar)
-        exit("[Fatal Error] Error while making phar. Please ensure that phar.readonly is disabled in php.ini.\n");
+        exit(
+                "[Fatal Error] Error while making phar. Please ensure that phar.readonly is disabled in php.ini.\n");
     $phar->buildFromDirectory($dir);
     $phar->setDefaultStub($default, null);
 }
 
-function checkEverything()
+function checkEverything ()
 {
     $errCount = 0;
     if (strstr(PHP_OS, "WIN")) {
@@ -44,17 +45,17 @@ function checkEverything()
         echo "[  Error ] \"git\" command is not available.\n";
         $errCount ++;
     }
-    $file = fopen("./.tmp", "a");
+    $file = fopen("./.write", "a");
     if (! fputs($file, ".")) {
         echo "[  Error ] Writing failed.            \n";
         $errCount ++;
     }
     fclose($file);
-    if (! file_get_contents("./.tmp")) {
+    if (! file_get_contents("./.write")) {
         echo "[  Error ] Reading failed.            \n";
         $errCount ++;
     }
-    unlink("./.tmp");
+    unlink("./.write");
     // finish
     if ($errCount == 0) {
         echo "\r[   OK   ] Finished with no errors! Continue.\n";
@@ -64,7 +65,7 @@ function checkEverything()
     }
 }
 
-function checkFiles($src = "./main")
+function checkFiles ($src = "./main")
 {
     global $fileErrors;
     $dir = opendir($src);
@@ -85,7 +86,7 @@ function checkFiles($src = "./main")
     closedir($dir);
 }
 
-function copydir($src, $dst)
+function copydir ($src, $dst)
 {
     // echo "Copying dir\t{$src}...\n";
     $dir = opendir($src);
@@ -103,14 +104,14 @@ function copydir($src, $dst)
     closedir($dir);
 }
 
-function copyfile($src, $dst)
+function copyfile ($src, $dst)
 {
     // echo "Copying file\t{$src}\n";
     copy($src, $dst);
     // echo "\n";
 }
 
-function deldir($dir)
+function deldir ($dir)
 {
     // echo "Deleting dir\t{$dir}\n";
     if (! is_dir($dir))
@@ -144,7 +145,7 @@ function deldir($dir)
         return false;
     }
 }
-$usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete cached files and download it.)\n\tcached\tUse cached files to build.\n";
+$usage = "Usage: php build.php <command> <args>\nCommands:\nbuild\tBuild this project.\n\tArgs:\n\tnormal\tNormal build. (Delete .cached files and download it.)\n\t.cached\tUse .cached files to build.\n";
 if ($argv[1] == "build") {
     if (! $argv[2]) {
         echo $usage;
@@ -154,38 +155,40 @@ if ($argv[1] == "build") {
     checkEverything();
     switch ($argv[2]) {
         case "normal":
-            @mkdir("cache");
+            @mkdir(".cache");
             echo "Downloading workerman...\n";
-            deldir("./cache");
-            system("git clone https://github.com/walkor/Workerman.git cache");
+            deldir("./.cache");
+            system("git clone https://github.com/walkor/Workerman.git .cache");
             echo "Done.\n";
-        case "cached":
-            echo "Checking if there are some grammer errors.\n";
+        case ".cached":
+            echo "Checking if there are some syntax errors.\n";
             checkFiles();
             if ($fileErrors > 0)
                 exit(2);
             echo "Deleting the last build files...\n";
-            @mkdir("tmp");
-            deldir("./tmp");
+            @mkdir(".tmp");
+            deldir("./.tmp");
             echo "Building...\n";
             echo "Building server side...\n";
-            @mkdir("tmp");
+            @mkdir(".tmp");
             echo "Copying files...\n";
-            copydir("./cache", "./tmp");
-            copydir("./main/server-side", "./tmp");
+            copydir("./.cache", "./.tmp");
+            copydir("./main/server-side", "./.tmp");
             echo "Making phar file...\n";
             @mkdir("target");
-            makephar(__DIR__ . "/tmp", "./target/GarageProxyServer.phar", "launcher.php");
+            makephar(__DIR__ . "/.tmp", "./target/GarageProxyServer.phar",
+                    "launcher.php");
             echo "Done.\n";
             echo "Building client side...\n";
-            deldir("./tmp");
-            @mkdir("tmp");
+            deldir("./.tmp");
+            @mkdir(".tmp");
             echo "Copying files...\n";
-            copydir("./cache", "./tmp");
+            copydir("./.cache", "./.tmp");
             copydir("./main/client-side", "./tmp");
             echo "Making phar file...\n";
-            makephar(__DIR__ . "/tmp", "./target/GarageProxyClient.phar", "start.php");
-            deldir("./tmp");
+            makephar(__DIR__ . "/.tmp", "./target/GarageProxyClient.phar",
+                    "start.php");
+            deldir("./.tmp");
             echo "Done.\n";
             exit(0);
     }

@@ -5,28 +5,28 @@ class PortChecker
 
     public static $status;
 
-    public function __construct()
+    public function __construct ()
     {
         return true;
     }
 
-    public function check($ip, $port)
+    public function check ($ip, $port)
     {
         $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         socket_set_nonblock($sock);
         socket_connect($sock, $ip, $port);
         socket_set_block($sock);
         self::$status = @socket_select($r = array(
-            $sock
+                $sock
         ), $w = array(
-            $sock
+                $sock
         ), $f = array(
-            $sock
+                $sock
         ), 5);
         return self::$status;
     }
 
-    public function status()
+    public function status ()
     {
         return self::$status;
     }
