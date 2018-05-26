@@ -160,7 +160,7 @@ if ($argv[1] == "build") {
             system("git clone https://github.com/walkor/Workerman.git cache");
             echo "Done.\n";
         case "cached":
-            echo "Checking if there are some grammer errors.\n";
+            echo "Checking if there are some syntax errors.\n";
             checkFiles();
             if ($fileErrors > 0)
                 exit(2);
