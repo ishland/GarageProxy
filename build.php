@@ -193,6 +193,7 @@ if ($argv[1] == "build") {
                     "start.php");
             deldir("./.tmp");
             echo "Done.\n";
+            @mkdir("test");
             exit(0);
     }
 }
