@@ -1,9 +1,7 @@
-Jenkinsfile (Declarative Pipeline)
-pipeline {
-    agent 'linux'
+node ("linux") {
     
     stages {
-        stage('Build') {
+        stage('Build and test') {
             steps {
                 sh '''php build.php build normal
                 cp ./target/GarageProxyServer.phar ./test/
