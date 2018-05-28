@@ -1,7 +1,9 @@
 node ("linux") {
     
     stage('Build and test') {
-        sh '''php build.php build normal
+        git url:"https://github.com/gutty-club/GarageProxy.git"
+        sh '''
+        php build.php build normal
         cp ./target/GarageProxyServer.phar ./test/
         cd test
         php GarageProxyServer.phar start -d
