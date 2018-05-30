@@ -40,6 +40,8 @@ https://discordapp.com/invite/Py4an4g
 ## Jenkins
 http://116.85.29.250:8080/job/GarageProxy/
 
+[![Load statistics](http://116.85.29.250:8080/label/linux/loadStatistics/graph?type=sec10&width=1300&height=500)](http://116.85.29.250:8080/label/linux/load-statistics?type=sec10)
+
 ## Requirements
 - PHP 5.3 or higher
 - A POSIX compatible operating system (Linux, OSX, BSD)
