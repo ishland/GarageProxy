@@ -1,9 +1,7 @@
 <?php
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\n";
 use Workerman\Worker;
-use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Connection\TcpConnection;
-use Workerman\Lib\Timer;
 require_once __DIR__ . '/Autoloader.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/class/PortChecker.php';
