@@ -14,7 +14,6 @@
 namespace Workerman\Connection;
 use Workerman\Events\EventInterface;
 use Workerman\Worker;
-use Exception;
 
 /**
  * TcpConnection.
@@ -349,9 +348,8 @@ class TcpConnection extends ConnectionInterface
             }
         }
         
-        if ($this->_status !== self::STATUS_ESTABLISHED ||
-                ($this->transport === 'ssl' &&
-                $this->_sslHandshakeCompleted !== true)) {
+        if ($this->_status !== self::STATUS_ESTABLISHED || ($this->transport ===
+                'ssl' && $this->_sslHandshakeCompleted !== true)) {
             if ($this->_sendBuffer) {
                 if ($this->bufferIsFull()) {
                     self::$statistics['send_fail'] ++;

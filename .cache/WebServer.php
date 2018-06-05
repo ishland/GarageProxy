@@ -13,7 +13,6 @@
  */
 namespace Workerman;
 use Workerman\Protocols\Http;
-use Workerman\Protocols\HttpCache;
 
 /**
  * WebServer.
@@ -197,12 +196,9 @@ class WebServer extends Worker
         // File exsits.
         if (is_file($workerman_file)) {
             // Security check.
-            if ((! ($workerman_request_realpath = realpath($workerman_file)) ||
-                    ! ($workerman_root_dir_realpath = realpath(
-                            $workerman_root_dir))) ||
-                    0 !==
-                    strpos($workerman_request_realpath,
-                            $workerman_root_dir_realpath)) {
+            if ((! ($workerman_request_realpath = realpath($workerman_file)) || ! ($workerman_root_dir_realpath = realpath(
+                    $workerman_root_dir))) || 0 !== strpos(
+                    $workerman_request_realpath, $workerman_root_dir_realpath)) {
                 Http::header('HTTP/1.1 400 Bad Request');
                 $connection->close('<h1>400 Bad Request</h1>');
                 return;

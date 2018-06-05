@@ -12,7 +12,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 namespace Workerman\Events\React;
-use Workerman\Events\EventInterface;
 
 /**
  * Class ExtLibEventLoop
