@@ -51,3 +51,16 @@ http://116.85.29.250:8080/job/GarageProxy/
 - Download all the files to your server.
 - Run `php build.php build normal`
 - The phar files will be in "target" directory.
+
+## Donate
+Paypal: https://paypal.me/ishland
+
+Bitcoin Core address: 1LzH1MNMga3WmRuX3WZ7UE8jCKmPh9t3Dq
+
+Bitcoin Cash: 
+
+Cash address: bitcoincash:qqh26f6qzr23eqy46lk5pcx3ckvflq726yse9mkppl
+
+Legacy address: 15FoWjDbAkxFrehhEdYfrrhA1bHMBSKfXn
+
+Bitpay address: CLih5mZf3ovnknc7vNsbSNKBdiVm3nojHx
