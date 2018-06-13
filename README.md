@@ -27,7 +27,7 @@ Super Develop
 ### Main repository
 - Github (Main repository): https://github.com/ishland/GarageProxy
 
-### Mirror repository (It will update in a few minutes)
+### Mirror repository ~~(They will update in a few minutes)~~ (We are so sorry)
 - Github (In Organization "gutty-club"): https://github.com/gutty-club/GarageProxy
 - BitBucket: https://bitbucket.org/ishland/garageproxy
 - GitLab: https://gitlab.com/ishland/GarageProxy
@@ -38,7 +38,10 @@ Super Develop
 https://discordapp.com/invite/Py4an4g
 
 ## Jenkins
+### We are so sorry, it is currently offline.
 http://116.85.29.250:8080/job/GarageProxy/
+
+[![Load statistics](http://116.85.29.250:8080/label/linux/loadStatistics/graph?type=sec10&width=1300&height=500)](http://116.85.29.250:8080/label/linux/load-statistics?type=sec10)
 
 ## Requirements
 - PHP 5.3 or higher
@@ -49,3 +52,16 @@ http://116.85.29.250:8080/job/GarageProxy/
 - Download all the files to your server.
 - Run `php build.php build normal`
 - The phar files will be in "target" directory.
+
+## Donate
+Paypal: https://paypal.me/ishland
+
+Bitcoin Core address: 1LzH1MNMga3WmRuX3WZ7UE8jCKmPh9t3Dq
+
+Bitcoin Cash: 
+
+Cash address: bitcoincash:qqh26f6qzr23eqy46lk5pcx3ckvflq726yse9mkppl
+
+Legacy address: 15FoWjDbAkxFrehhEdYfrrhA1bHMBSKfXn
+
+Bitpay address: CLih5mZf3ovnknc7vNsbSNKBdiVm3nojHx
