@@ -27,7 +27,7 @@ Super Develop
 ### Main repository
 - Github (Main repository): https://github.com/ishland/GarageProxy
 
-### Mirror repository (They will update in a few minutes)
+### Mirror repository ~~(They will update in a few minutes)~~ (We are so sorry)
 - Github (In Organization "gutty-club"): https://github.com/gutty-club/GarageProxy
 - BitBucket: https://bitbucket.org/ishland/garageproxy
 - GitLab: https://gitlab.com/ishland/GarageProxy
@@ -38,6 +38,7 @@ Super Develop
 https://discordapp.com/invite/Py4an4g
 
 ## Jenkins
+### We are so sorry, it is currently offline.
 http://116.85.29.250:8080/job/GarageProxy/
 
 [![Load statistics](http://116.85.29.250:8080/label/linux/loadStatistics/graph?type=sec10&width=1300&height=500)](http://116.85.29.250:8080/label/linux/load-statistics?type=sec10)
