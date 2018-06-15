@@ -13,7 +13,7 @@
  */
 
 // Date.timezone
-if (! ini_get('date.timezone')) {
+if (!ini_get('date.timezone')) {
     date_default_timezone_set('Asia/Shanghai');
 }
 // Display errors.
@@ -36,8 +36,8 @@ define('OS_TYPE_LINUX', 'linux');
 define('OS_TYPE_WINDOWS', 'windows');
 
 // Compatible with php7
-if (! class_exists('Error')) {
-
+if(!class_exists('Error'))
+{
     class Error extends Exception
     {
     }

@@ -12,6 +12,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 namespace Workerman\Events;
+
 use Swoole\Event;
 use Swoole\Timer;
 
@@ -35,7 +36,7 @@ class Swoole implements EventInterface
      *
      * @see \Workerman\Events\EventInterface::add()
      */
-    public function add ($fd, $flag, $func, $args = null)
+    public function add($fd, $flag, $func, $args = null)
     {
         if (! isset($args)) {
             $args = array();
@@ -45,10 +46,9 @@ class Swoole implements EventInterface
                 $res = pcntl_signal($fd, $func, false);
                 if (! $this->_hasSignal && $res) {
                     Timer::tick(static::$signalDispatchInterval,
-                            function ()
-                            {
-                                pcntl_signal_dispatch();
-                            });
+                        function () {
+                            pcntl_signal_dispatch();
+                        });
                     $this->_hasSignal = true;
                 }
                 return $res;
@@ -57,20 +57,18 @@ class Swoole implements EventInterface
                 $method = self::EV_TIMER == $flag ? 'tick' : 'after';
                 $mapId = count($this->_timerOnceMap);
                 $timer_id = Timer::$method($fd * 1000,
-                        function ($timer_id = null) use ( $func, $args, $mapId)
-                        {
-                            call_user_func_array($func, $args);
-                            // EV_TIMER_ONCE
-                            if (! isset($timer_id)) {
-                                // may be deleted in $func
-                                if (array_key_exists($mapId,
-                                        $this->_timerOnceMap)) {
-                                    $timer_id = $this->_timerOnceMap[$mapId];
-                                    unset($this->_timer[$timer_id],
-                                            $this->_timerOnceMap[$mapId]);
-                                }
+                    function ($timer_id = null) use ($func, $args, $mapId) {
+                        call_user_func_array($func, $args);
+                        // EV_TIMER_ONCE
+                        if (! isset($timer_id)) {
+                            // may be deleted in $func
+                            if (array_key_exists($mapId, $this->_timerOnceMap)) {
+                                $timer_id = $this->_timerOnceMap[$mapId];
+                                unset($this->_timer[$timer_id],
+                                    $this->_timerOnceMap[$mapId]);
                             }
-                        });
+                        }
+                    });
                 if ($flag == self::EV_TIMER_ONCE) {
                     $this->_timerOnceMap[$mapId] = $timer_id;
                     $this->_timer[$timer_id] = $mapId;
@@ -98,13 +96,13 @@ class Swoole implements EventInterface
                     if ($flag == self::EV_READ) {
                         if (($fd_val & SWOOLE_EVENT_READ) != SWOOLE_EVENT_READ) {
                             $res = Event::set($fd, $func, null,
-                                    SWOOLE_EVENT_READ | SWOOLE_EVENT_WRITE);
+                                SWOOLE_EVENT_READ | SWOOLE_EVENT_WRITE);
                             $this->_fd[$fd_key] |= SWOOLE_EVENT_READ;
                         }
                     } else {
                         if (($fd_val & SWOOLE_EVENT_WRITE) != SWOOLE_EVENT_WRITE) {
                             $res = Event::set($fd, null, $func,
-                                    SWOOLE_EVENT_READ | SWOOLE_EVENT_WRITE);
+                                SWOOLE_EVENT_READ | SWOOLE_EVENT_WRITE);
                             $this->_fd[$fd_key] |= SWOOLE_EVENT_WRITE;
                         }
                     }
@@ -119,7 +117,7 @@ class Swoole implements EventInterface
      *
      * @see \Workerman\Events\EventInterface::del()
      */
-    public function del ($fd, $flag)
+    public function del($fd, $flag)
     {
         switch ($flag) {
             case self::EV_SIGNAL:
@@ -174,7 +172,7 @@ class Swoole implements EventInterface
      *
      * @see \Workerman\Events\EventInterface::clearAllTimer()
      */
-    public function clearAllTimer ()
+    public function clearAllTimer()
     {
         foreach (array_keys($this->_timer) as $v) {
             Timer::clear($v);
@@ -189,7 +187,7 @@ class Swoole implements EventInterface
      *
      * @see \Workerman\Events\EventInterface::loop()
      */
-    public function loop ()
+    public function loop()
     {
         Event::wait();
     }
@@ -200,9 +198,9 @@ class Swoole implements EventInterface
      *
      * @see \Workerman\Events\EventInterface::destroy()
      */
-    public function destroy ()
+    public function destroy()
     {
-        // Event::exit();
+        //Event::exit();
     }
 
     /**
@@ -211,7 +209,7 @@ class Swoole implements EventInterface
      *
      * @see \Workerman\Events\EventInterface::getTimerCount()
      */
-    public function getTimerCount ()
+    public function getTimerCount()
     {
         return count($this->_timer);
     }

@@ -15,7 +15,6 @@ namespace Workerman\Events;
 
 interface EventInterface
 {
-
     /**
      * Read event.
      *
@@ -61,48 +60,48 @@ interface EventInterface
     /**
      * Add event listener to event loop.
      *
-     * @param mixed $fd
-     * @param int $flag
+     * @param mixed    $fd
+     * @param int      $flag
      * @param callable $func
-     * @param mixed $args
+     * @param mixed    $args
      * @return bool
      */
-    public function add ($fd, $flag, $func, $args = null);
+    public function add($fd, $flag, $func, $args = null);
 
     /**
      * Remove event listener from event loop.
      *
      * @param mixed $fd
-     * @param int $flag
+     * @param int   $flag
      * @return bool
      */
-    public function del ($fd, $flag);
+    public function del($fd, $flag);
 
     /**
      * Remove all timers.
      *
      * @return void
      */
-    public function clearAllTimer ();
+    public function clearAllTimer();
 
     /**
      * Main loop.
      *
      * @return void
      */
-    public function loop ();
+    public function loop();
 
     /**
      * Destroy loop.
      *
      * @return mixed
      */
-    public function destroy ();
+    public function destroy();
 
     /**
      * Get Timer count.
      *
      * @return mixed
      */
-    public function getTimerCount ();
+    public function getTimerCount();
 }
