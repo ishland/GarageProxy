@@ -18,6 +18,7 @@ namespace Workerman\Connection;
  */
 class UdpConnection extends ConnectionInterface
 {
+
     /**
      * Application layer protocol.
      * The format is like this Workerman\\Protocols\\Http.
@@ -44,11 +45,11 @@ class UdpConnection extends ConnectionInterface
      * Construct.
      *
      * @param resource $socket
-     * @param string   $remote_address
+     * @param string $remote_address
      */
-    public function __construct($socket, $remote_address)
+    public function __construct ($socket, $remote_address)
     {
-        $this->_socket        = $socket;
+        $this->_socket = $socket;
         $this->_remoteAddress = $remote_address;
     }
 
@@ -56,19 +57,20 @@ class UdpConnection extends ConnectionInterface
      * Sends data on the connection.
      *
      * @param string $send_buffer
-     * @param bool   $raw
+     * @param bool $raw
      * @return void|boolean
      */
-    public function send($send_buffer, $raw = false)
+    public function send ($send_buffer, $raw = false)
     {
         if (false === $raw && $this->protocol) {
-            $parser      = $this->protocol;
+            $parser = $this->protocol;
             $send_buffer = $parser::encode($send_buffer, $this);
             if ($send_buffer === '') {
                 return null;
             }
         }
-        return strlen($send_buffer) === stream_socket_sendto($this->_socket, $send_buffer, 0, $this->_remoteAddress);
+        return strlen($send_buffer) === stream_socket_sendto($this->_socket,
+                $send_buffer, 0, $this->_remoteAddress);
     }
 
     /**
@@ -76,7 +78,7 @@ class UdpConnection extends ConnectionInterface
      *
      * @return string
      */
-    public function getRemoteIp()
+    public function getRemoteIp ()
     {
         $pos = strrpos($this->_remoteAddress, ':');
         if ($pos) {
@@ -90,10 +92,10 @@ class UdpConnection extends ConnectionInterface
      *
      * @return int
      */
-    public function getRemotePort()
+    public function getRemotePort ()
     {
         if ($this->_remoteAddress) {
-            return (int)substr(strrchr($this->_remoteAddress, ':'), 1);
+            return (int) substr(strrchr($this->_remoteAddress, ':'), 1);
         }
         return 0;
     }
@@ -103,7 +105,7 @@ class UdpConnection extends ConnectionInterface
      *
      * @return string
      */
-    public function getRemoteAddress()
+    public function getRemoteAddress ()
     {
         return $this->_remoteAddress;
     }
@@ -113,11 +115,11 @@ class UdpConnection extends ConnectionInterface
      *
      * @return string
      */
-    public function getLocalIp()
+    public function getLocalIp ()
     {
         $address = $this->getLocalAddress();
         $pos = strrpos($address, ':');
-        if (!$pos) {
+        if (! $pos) {
             return '';
         }
         return substr($address, 0, $pos);
@@ -128,14 +130,14 @@ class UdpConnection extends ConnectionInterface
      *
      * @return int
      */
-    public function getLocalPort()
+    public function getLocalPort ()
     {
         $address = $this->getLocalAddress();
         $pos = strrpos($address, ':');
-        if (!$pos) {
+        if (! $pos) {
             return 0;
         }
-        return (int)substr(strrchr($address, ':'), 1);
+        return (int) substr(strrchr($address, ':'), 1);
     }
 
     /**
@@ -143,9 +145,9 @@ class UdpConnection extends ConnectionInterface
      *
      * @return string
      */
-    public function getLocalAddress()
+    public function getLocalAddress ()
     {
-        return (string)@stream_socket_get_name($this->_socket, false);
+        return (string) @stream_socket_get_name($this->_socket, false);
     }
 
     /**
@@ -153,7 +155,7 @@ class UdpConnection extends ConnectionInterface
      *
      * return bool.
      */
-    public function isIpV4()
+    public function isIpV4 ()
     {
         if ($this->transport === 'unix') {
             return false;
@@ -166,7 +168,7 @@ class UdpConnection extends ConnectionInterface
      *
      * return bool.
      */
-    public function isIpV6()
+    public function isIpV6 ()
     {
         if ($this->transport === 'unix') {
             return false;
@@ -178,10 +180,10 @@ class UdpConnection extends ConnectionInterface
      * Close connection.
      *
      * @param mixed $data
-     * @param bool  $raw
+     * @param bool $raw
      * @return bool
      */
-    public function close($data = null, $raw = false)
+    public function close ($data = null, $raw = false)
     {
         if ($data !== null) {
             $this->send($data, $raw);

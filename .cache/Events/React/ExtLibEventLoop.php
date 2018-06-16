@@ -16,11 +16,13 @@ use Workerman\Events\EventInterface;
 
 /**
  * Class ExtLibEventLoop
+ *
  * @package Workerman\Events\React
  */
 class ExtLibEventLoop extends Base
 {
-    public function __construct()
+
+    public function __construct ()
     {
         $this->_eventLoop = new \React\EventLoop\ExtLibeventLoop();
     }
