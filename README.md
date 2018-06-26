@@ -38,9 +38,7 @@ Super Develop
 https://discordapp.com/invite/Py4an4g
 
 ## Jenkins
-~~http://116.85.29.250:8080/job/GarageProxy/~~
-
-http://frpzj.lu8.win:52005/job/GarageProxy/
+http://jenkins.ishland.site/job/GarageProxy
 
 ## Requirements
 - PHP 5.3 or higher
