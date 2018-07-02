@@ -245,4 +245,14 @@ class ProxyWorker
             $connection->resumeRecv();
         };
     }
+
+    public function onConnectMode2 ($connection)
+    {
+        global $workerid, $ADDRESS, $global_uid;
+        global $$workerid;
+        $connection_to_server = new AsyncTcpConnection($ADDRESS);
+        $connection->pipe($connection_to_server);
+        $connection_to_server->pipe($connection);
+        $connection_to_80->connect();
+    }
 }
