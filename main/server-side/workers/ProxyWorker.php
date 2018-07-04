@@ -250,39 +250,9 @@ class ProxyWorker
     {
         global $workerid, $ADDRESS, $global_uid;
         global $$workerid;
-        $connection->uid = ++ $global_uid;
-        $connection->worker = $$workerid->id;
-        $connection->proxyid = $$workerid->proxyid;
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "new_conn",
-                                "ip" => $connection->getRemoteIp(),
-                                "port" => $connection->getRemotePort(),
-                                "uid" => $connection->uid
-                        )));
         $connection_to_server = new AsyncTcpConnection($ADDRESS);
         $connection->pipe($connection_to_server);
         $connection_to_server->pipe($connection);
-        $connection->onClose = function ($connection) use ( 
-        $connection_to_server)
-        {
-            global $conn_to_master;
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "close_conn",
-                                    "ip" => $connection->getRemoteIp(),
-                                    "port" => $connection->getRemotePort(),
-                                    "uid" => $connection->uid
-                            )));
-            $connection_to_server->close();
-        };
-        $connection_to_server->onClose = function ($connection_to_server) use ( 
-        $connection)
-        {
-            $connection->close();
-        };
         $connection_to_80->connect();
     }
 }
