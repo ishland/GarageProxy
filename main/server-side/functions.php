@@ -81,21 +81,19 @@ function loadConfig ()
                 file_get_contents(__DIR__ . "/defaults/config.php"));
     }
     require_once getcwd() . "/config.php";
-    $config = $CONFIG; // For older than 5.4 versions
+    $config = $CONFIG; // For older than PHP 7.0 versions
     if ($config["settings"]["mode"] == 1) {
         foreach ($config["workers"] as $arr) {
             setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
         }
-    } else {
-        echo "[" . date('Y-m-d H:i:s') .
-                "][Main][Init][Warn] Configuration is not vaild! Mode is invaild! Using mode 1.";
+    } elseif (a) {
         foreach ($config["workers"] as $arr) {
-            setWorker($arr["addr"], $arr["remote"], $arr["processes"]);
+            setWorker($arr["addr"], $arr["remote"], $arr["processes"], 2);
         }
     }
 }
 
-function setWorker ($listening, $remote, $workers)
+function setWorker ($listening, $remote, $workers, $mode = 1)
 {
     global $workerid;
     $workerid = $workerid + 1;
@@ -127,7 +125,7 @@ function setWorker ($listening, $remote, $workers)
     );
     $$workerid->onConnect = array(
             new ProxyWorker(),
-            'onConnectMode1'
+            'onConnectMode' . $mode
     );
     echo "[" . date('Y-m-d H:i:s') .
             "][Main][Init][Info] Configuration of Worker-{$workerid} has completed.\n";
