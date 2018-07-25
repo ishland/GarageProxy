@@ -39,6 +39,7 @@ https://discordapp.com/invite/Py4an4g
 
 ## Jenkins
 http://jenkins.ishland.site/job/GarageProxy
+https://jenkins-ssl.ishland.site/job/GarageProxy
 
 ## Requirements
 - PHP 5.3 or higher
