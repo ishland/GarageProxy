@@ -1,11 +1,11 @@
 <?php
 echo "[" . date('Y-m-d H:i:s') . "][Main][Init][Info] Initializing...\n";
-use Workerman\Worker;
-use Workerman\Connection\TcpConnection;
 require_once __DIR__ . '/Autoloader.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/class/PortChecker.php';
 require_once __DIR__ . '/workers/ProxyWorker.php';
+use Workerman\Worker;
+use Workerman\Connection\TcpConnection;
 @mkdir(getcwd() . "/logs");
 Worker::$stdoutFile = getcwd() . '/logs/latest.log';
 Worker::$pidFile = getcwd() . '/.pid';

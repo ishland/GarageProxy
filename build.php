@@ -158,10 +158,10 @@ if ($argv[1] == "build") {
     checkEverything();
     switch ($argv[2]) {
         case "normal":
-            @mkdir(".cache");
+            @mkdir("Workerman");
             echo "Downloading workerman...\n";
-            deldir("./.cache");
-            system("git clone https://github.com/walkor/Workerman.git .cache");
+            deldir("./Workerman");
+            system("git clone https://github.com/walkor/Workerman.git");
             echo "Done.\n";
         case "cached":
             echo "Checking if there are some syntax errors.\n";
@@ -169,30 +169,21 @@ if ($argv[1] == "build") {
             if ($fileErrors > 0)
                 exit(2);
             echo "Deleting the last build files...\n";
-            @mkdir(".tmp");
-            deldir("./.tmp");
+            @mkdir("build");
+            deldir("./build");
             echo "Building...\n";
             echo "Building server side...\n";
             @mkdir(".tmp");
             echo "Copying files...\n";
-            copydir("./.cache", "./.tmp");
-            copydir("./main/server-side", "./.tmp");
+            copydir("./Workerman", "./build");
+            copydir("./main/server-side", "./build");
             echo "Making phar file...\n";
             @mkdir("target");
-            makephar(__DIR__ . "/.tmp", "./target/GarageProxyServer.phar",
+            makephar(__DIR__ . "/build", "./target/GarageProxyServer.phar",
                     "launcher.php");
             echo "Done.\n";
             echo "Building client side...\n";
-            deldir("./.tmp");
-            @mkdir(".tmp");
-            echo "Copying files...\n";
-            copydir("./.cache", "./.tmp");
-            copydir("./main/client-side", "./tmp");
-            echo "Making phar file...\n";
-            makephar(__DIR__ . "/.tmp", "./target/GarageProxyClient.phar",
-                    "start.php");
-            deldir("./.tmp");
-            echo "Done.\n";
+            deldir("./build");
             @mkdir("test");
             exit(0);
     }

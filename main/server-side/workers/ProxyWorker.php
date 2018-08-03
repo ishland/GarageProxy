@@ -49,8 +49,6 @@ class ProxyWorker
         $connection->uid = ++ $global_uid;
         $connection->worker = $$workerid->id;
         $connection->proxyid = $$workerid->proxyid;
-        $connection->compression = false;
-        $connection->firstmsg = true;
         $conn_to_master->send(
                 json_encode(
                         Array(
@@ -64,27 +62,6 @@ class ProxyWorker
                 $buffer) use ( $connection)
         {
             global $conn_to_master;
-            if ($connection->compression) {
-                $conn_to_master->send(
-                        json_encode(
-                                Array(
-                                        "action" => "new_msg",
-                                        "handle" => "in",
-                                        "strlen" => strlen($buffer),
-                                        "uid" => $connection->uid
-                                )));
-                $compressed = gzdeflate($buffer, 9);
-                $connection->send($compressed);
-                $conn_to_master->send(
-                        json_encode(
-                                Array(
-                                        "action" => "new_msg",
-                                        "handle" => "out",
-                                        "strlen" => strlen($compressed),
-                                        "uid" => $connection->uid
-                                )));
-                return;
-            }
             $conn_to_master->send(
                     json_encode(
                             Array(
@@ -130,63 +107,6 @@ class ProxyWorker
         $connection_to_server)
         {
             global $conn_to_master;
-            if ($connection->firstmsg) {
-                if (substr($buffer, 0, 17) !== "GarageProxyClient") {
-                    $conn_to_master->send(
-                            json_encode(
-                                    Array(
-                                            "action" => "new_msg",
-                                            "handle" => "in",
-                                            "strlen" => strlen($buffer),
-                                            "uid" => $connection->uid
-                                    )));
-                    $connection_to_server->send($buffer);
-                    $conn_to_master->send(
-                            json_encode(
-                                    Array(
-                                            "action" => "new_msg",
-                                            "handle" => "out",
-                                            "strlen" => strlen($buffer),
-                                            "uid" => $connection->uid
-                                    )));
-                    $connection->firstmsg = false;
-                    return;
-                }
-                $arr = json_decode(substr($buffer, 17), true);
-                $connection->compression = $arr['compression'];
-                $connection->firstmsg = false;
-                $connection->send("GarageProxy-OK");
-                $conn_to_master->send(
-                        json_encode(
-                                Array(
-                                        "action" => "new_msg",
-                                        "handle" => "in",
-                                        "strlen" => strlen($buffer),
-                                        "uid" => $connection->uid
-                                )));
-                return;
-            }
-            if ($connection->compression) {
-                $conn_to_master->send(
-                        json_encode(
-                                Array(
-                                        "action" => "new_msg",
-                                        "handle" => "in",
-                                        "strlen" => strlen($buffer),
-                                        "uid" => $connection->uid
-                                )));
-                $uncompressed = gzinflate($buffer);
-                $connection_to_server->send($uncompressed);
-                $conn_to_master->send(
-                        json_encode(
-                                Array(
-                                        "action" => "new_msg",
-                                        "handle" => "out",
-                                        "strlen" => strlen($uncompressed),
-                                        "uid" => $connection->uid
-                                )));
-                return;
-            }
             $conn_to_master->send(
                     json_encode(
                             Array(
