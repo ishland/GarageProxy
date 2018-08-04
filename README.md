@@ -1,6 +1,8 @@
 # GarageProxy
 Forwards services from LAN.
 
+[![Build Status](https://jenkins-cn.ishland.site/job/GarageProxy/badge/icon)](https://jenkins-cn.ishland.site/job/GarageProxy/)
+
 ## Status of every branch
 Master
 
