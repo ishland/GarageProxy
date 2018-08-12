@@ -12,7 +12,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 namespace Workerman\Connection;
-
 use Workerman\Events\EventInterface;
 use Workerman\Lib\Timer;
 use Workerman\Worker;
@@ -23,6 +22,7 @@ use Exception;
  */
 class AsyncTcpConnection extends TcpConnection
 {
+
     /**
      * Emitted when socket connection is successfully established.
      *
@@ -86,20 +86,19 @@ class AsyncTcpConnection extends TcpConnection
      */
     protected $_reconnectTimer = null;
 
-
     /**
      * PHP built-in protocols.
      *
      * @var array
      */
     protected static $_builtinTransports = array(
-        'tcp'   => 'tcp',
-        'udp'   => 'udp',
-        'unix'  => 'unix',
-        'ssl'   => 'ssl',
-        'sslv2' => 'sslv2',
-        'sslv3' => 'sslv3',
-        'tls'   => 'tls'
+            'tcp' => 'tcp',
+            'udp' => 'udp',
+            'unix' => 'unix',
+            'ssl' => 'ssl',
+            'sslv2' => 'sslv2',
+            'sslv3' => 'sslv3',
+            'tls' => 'tls'
     );
 
     /**
@@ -109,55 +108,56 @@ class AsyncTcpConnection extends TcpConnection
      * @param array $context_option
      * @throws Exception
      */
-    public function __construct($remote_address, $context_option = null)
+    public function __construct ($remote_address, $context_option = null)
     {
         $address_info = parse_url($remote_address);
-        if (!$address_info) {
-            list($scheme, $this->_remoteAddress) = explode(':', $remote_address, 2);
-            if (!$this->_remoteAddress) {
+        if (! $address_info) {
+            list ($scheme, $this->_remoteAddress) = explode(':', $remote_address,
+                    2);
+            if (! $this->_remoteAddress) {
                 Worker::safeEcho(new \Exception('bad remote_address'));
             }
         } else {
-            if (!isset($address_info['port'])) {
+            if (! isset($address_info['port'])) {
                 $address_info['port'] = 80;
             }
-            if (!isset($address_info['path'])) {
+            if (! isset($address_info['path'])) {
                 $address_info['path'] = '/';
             }
-            if (!isset($address_info['query'])) {
+            if (! isset($address_info['query'])) {
                 $address_info['query'] = '';
             } else {
                 $address_info['query'] = '?' . $address_info['query'];
             }
             $this->_remoteAddress = "{$address_info['host']}:{$address_info['port']}";
-            $this->_remoteHost    = $address_info['host'];
-            $this->_remotePort    = $address_info['port'];
-            $this->_remoteURI     = "{$address_info['path']}{$address_info['query']}";
-            $scheme               = isset($address_info['scheme']) ? $address_info['scheme'] : 'tcp';
+            $this->_remoteHost = $address_info['host'];
+            $this->_remotePort = $address_info['port'];
+            $this->_remoteURI = "{$address_info['path']}{$address_info['query']}";
+            $scheme = isset($address_info['scheme']) ? $address_info['scheme'] : 'tcp';
         }
-
-        $this->id = $this->_id = self::$_idRecorder++;
-        if(PHP_INT_MAX === self::$_idRecorder){
+        
+        $this->id = $this->_id = self::$_idRecorder ++;
+        if (PHP_INT_MAX === self::$_idRecorder) {
             self::$_idRecorder = 0;
         }
         // Check application layer protocol class.
-        if (!isset(self::$_builtinTransports[$scheme])) {
-            $scheme         = ucfirst($scheme);
+        if (! isset(self::$_builtinTransports[$scheme])) {
+            $scheme = ucfirst($scheme);
             $this->protocol = '\\Protocols\\' . $scheme;
-            if (!class_exists($this->protocol)) {
+            if (! class_exists($this->protocol)) {
                 $this->protocol = "\\Workerman\\Protocols\\$scheme";
-                if (!class_exists($this->protocol)) {
+                if (! class_exists($this->protocol)) {
                     throw new Exception("class \\Protocols\\$scheme not exist");
                 }
             }
         } else {
             $this->transport = self::$_builtinTransports[$scheme];
         }
-
+        
         // For statistics.
-        self::$statistics['connection_count']++;
-        $this->maxSendBufferSize         = self::$defaultMaxSendBufferSize;
-        $this->_contextOption            = $context_option;
+        self::$statistics['connection_count'] ++;
+        $this->maxSendBufferSize = self::$defaultMaxSendBufferSize;
+        $this->_contextOption = $context_option;
         static::$connections[$this->_id] = $this;
     }
 
@@ -166,30 +166,34 @@ class AsyncTcpConnection extends TcpConnection
      *
      * @return void
      */
-    public function connect()
+    public function connect ()
     {
-        if ($this->_status !== self::STATUS_INITIAL && $this->_status !== self::STATUS_CLOSING &&
-            $this->_status !== self::STATUS_CLOSED) {
+        if ($this->_status !== self::STATUS_INITIAL &&
+                $this->_status !== self::STATUS_CLOSING &&
+                $this->_status !== self::STATUS_CLOSED) {
             return;
         }
-        $this->_status           = self::STATUS_CONNECTING;
+        $this->_status = self::STATUS_CONNECTING;
         $this->_connectStartTime = microtime(true);
         if ($this->transport !== 'unix') {
             // Open socket connection asynchronously.
             if ($this->_contextOption) {
                 $context = stream_context_create($this->_contextOption);
-                $this->_socket = stream_socket_client("tcp://{$this->_remoteHost}:{$this->_remotePort}",
-                    $errno, $errstr, 0, STREAM_CLIENT_ASYNC_CONNECT, $context);
+                $this->_socket = stream_socket_client(
+                        "tcp://{$this->_remoteHost}:{$this->_remotePort}", $errno,
+                        $errstr, 0, STREAM_CLIENT_ASYNC_CONNECT, $context);
             } else {
-                $this->_socket = stream_socket_client("tcp://{$this->_remoteHost}:{$this->_remotePort}",
-                    $errno, $errstr, 0, STREAM_CLIENT_ASYNC_CONNECT);
+                $this->_socket = stream_socket_client(
+                        "tcp://{$this->_remoteHost}:{$this->_remotePort}", $errno,
+                        $errstr, 0, STREAM_CLIENT_ASYNC_CONNECT);
             }
         } else {
-            $this->_socket = stream_socket_client("{$this->transport}://{$this->_remoteAddress}", $errno, $errstr, 0,
-                STREAM_CLIENT_ASYNC_CONNECT);
+            $this->_socket = stream_socket_client(
+                    "{$this->transport}://{$this->_remoteAddress}", $errno,
+                    $errstr, 0, STREAM_CLIENT_ASYNC_CONNECT);
         }
         // If failed attempt to emit onError callback.
-        if (!$this->_socket) {
+        if (! $this->_socket) {
             $this->emitError(WORKERMAN_CONNECT_FAIL, $errstr);
             if ($this->_status === self::STATUS_CLOSING) {
                 $this->destroy();
@@ -199,11 +203,20 @@ class AsyncTcpConnection extends TcpConnection
             }
             return;
         }
-        // Add socket to global event loop waiting connection is successfully established or faild.
-        Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, array($this, 'checkConnection'));
+        // Add socket to global event loop waiting connection is successfully
+        // established or faild.
+        Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE,
+                array(
+                        $this,
+                        'checkConnection'
+                ));
         // For windows.
-        if(DIRECTORY_SEPARATOR === '\\') {
-            Worker::$globalEvent->add($this->_socket, EventInterface::EV_EXCEPT, array($this, 'checkConnection'));
+        if (DIRECTORY_SEPARATOR === '\\') {
+            Worker::$globalEvent->add($this->_socket, EventInterface::EV_EXCEPT,
+                    array(
+                            $this,
+                            'checkConnection'
+                    ));
         }
     }
 
@@ -213,15 +226,18 @@ class AsyncTcpConnection extends TcpConnection
      * @param int $after
      * @return void
      */
-    public function reconnect($after = 0)
+    public function reconnect ($after = 0)
     {
-        $this->_status                   = self::STATUS_INITIAL;
+        $this->_status = self::STATUS_INITIAL;
         static::$connections[$this->_id] = $this;
         if ($this->_reconnectTimer) {
             Timer::del($this->_reconnectTimer);
         }
         if ($after > 0) {
-            $this->_reconnectTimer = Timer::add($after, array($this, 'connect'), null, false);
+            $this->_reconnectTimer = Timer::add($after, array(
+                    $this,
+                    'connect'
+            ), null, false);
             return;
         }
         $this->connect();
@@ -230,7 +246,7 @@ class AsyncTcpConnection extends TcpConnection
     /**
      * CancelReconnect.
      */
-    public function cancelReconnect()
+    public function cancelReconnect ()
     {
         if ($this->_reconnectTimer) {
             Timer::del($this->_reconnectTimer);
@@ -242,7 +258,7 @@ class AsyncTcpConnection extends TcpConnection
      *
      * @return string
      */
-    public function getRemoteHost()
+    public function getRemoteHost ()
     {
         return $this->_remoteHost;
     }
@@ -252,7 +268,7 @@ class AsyncTcpConnection extends TcpConnection
      *
      * @return string
      */
-    public function getRemoteURI()
+    public function getRemoteURI ()
     {
         return $this->_remoteURI;
     }
@@ -260,11 +276,11 @@ class AsyncTcpConnection extends TcpConnection
     /**
      * Try to emit onError callback.
      *
-     * @param int    $code
+     * @param int $code
      * @param string $msg
      * @return void
      */
-    protected function emitError($code, $msg)
+    protected function emitError ($code, $msg)
     {
         $this->_status = self::STATUS_CLOSING;
         if ($this->onError) {
@@ -286,17 +302,17 @@ class AsyncTcpConnection extends TcpConnection
      * @param resource $socket
      * @return void
      */
-    public function checkConnection()
+    public function checkConnection ()
     {
         if ($this->_status != self::STATUS_CONNECTING) {
             return;
         }
-
+        
         // Remove EV_EXPECT for windows.
-        if(DIRECTORY_SEPARATOR === '\\') {
+        if (DIRECTORY_SEPARATOR === '\\') {
             Worker::$globalEvent->del($this->_socket, EventInterface::EV_EXCEPT);
         }
-
+        
         // Check socket state.
         if ($address = stream_socket_get_name($this->_socket, true)) {
             // Nonblocking.
@@ -306,31 +322,41 @@ class AsyncTcpConnection extends TcpConnection
                 stream_set_read_buffer($this->_socket, 0);
             }
             // Try to open keepalive for tcp and disable Nagle algorithm.
-            if (function_exists('socket_import_stream') && $this->transport === 'tcp') {
+            if (function_exists('socket_import_stream') &&
+                    $this->transport === 'tcp') {
                 $raw_socket = socket_import_stream($this->_socket);
                 socket_set_option($raw_socket, SOL_SOCKET, SO_KEEPALIVE, 1);
                 socket_set_option($raw_socket, SOL_TCP, TCP_NODELAY, 1);
             }
-
+            
             // Remove write listener.
             Worker::$globalEvent->del($this->_socket, EventInterface::EV_WRITE);
-
+            
             // SSL handshake.
             if ($this->transport === 'ssl') {
-                $this->_sslHandshakeCompleted = $this->doSslHandshake($this->_socket);
+                $this->_sslHandshakeCompleted = $this->doSslHandshake(
+                        $this->_socket);
             } else {
                 // There are some data waiting to send.
                 if ($this->_sendBuffer) {
-                    Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, array($this, 'baseWrite'));
+                    Worker::$globalEvent->add($this->_socket,
+                            EventInterface::EV_WRITE, array(
+                                    $this,
+                                    'baseWrite'
+                            ));
                 }
             }
-
+            
             // Register a listener waiting read event.
-            Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ, array($this, 'baseRead'));
-
-            $this->_status                = self::STATUS_ESTABLISHED;
-            $this->_remoteAddress         = $address;
-
+            Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ,
+                    array(
+                            $this,
+                            'baseRead'
+                    ));
+            
+            $this->_status = self::STATUS_ESTABLISHED;
+            $this->_remoteAddress = $address;
+            
             // Try to emit onConnect callback.
             if ($this->onConnect) {
                 try {
@@ -346,7 +372,10 @@ class AsyncTcpConnection extends TcpConnection
             // Try to emit protocol::onConnect
             if (method_exists($this->protocol, 'onConnect')) {
                 try {
-                    call_user_func(array($this->protocol, 'onConnect'), $this);
+                    call_user_func(array(
+                            $this->protocol,
+                            'onConnect'
+                    ), $this);
                 } catch (\Exception $e) {
                     Worker::log($e);
                     exit(250);
@@ -357,7 +386,10 @@ class AsyncTcpConnection extends TcpConnection
             }
         } else {
             // Connection failed.
-            $this->emitError(WORKERMAN_CONNECT_FAIL, 'connect ' . $this->_remoteAddress . ' fail after ' . round(microtime(true) - $this->_connectStartTime, 4) . ' seconds');
+            $this->emitError(WORKERMAN_CONNECT_FAIL,
+                    'connect ' . $this->_remoteAddress . ' fail after ' .
+                    round(microtime(true) - $this->_connectStartTime, 4) .
+                    ' seconds');
             if ($this->_status === self::STATUS_CLOSING) {
                 $this->destroy();
             }

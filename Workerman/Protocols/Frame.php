@@ -12,7 +12,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 namespace Workerman\Protocols;
-
 use Workerman\Connection\TcpConnection;
 
 /**
@@ -20,14 +19,15 @@ use Workerman\Connection\TcpConnection;
  */
 class Frame
 {
+
     /**
      * Check the integrity of the package.
      *
-     * @param string        $buffer
+     * @param string $buffer
      * @param TcpConnection $connection
      * @return int
      */
-    public static function input($buffer, TcpConnection $connection)
+    public static function input ($buffer, TcpConnection $connection)
     {
         if (strlen($buffer) < 4) {
             return 0;
@@ -42,7 +42,7 @@ class Frame
      * @param string $buffer
      * @return string
      */
-    public static function decode($buffer)
+    public static function decode ($buffer)
     {
         return substr($buffer, 4);
     }
@@ -53,7 +53,7 @@ class Frame
      * @param string $buffer
      * @return string
      */
-    public static function encode($buffer)
+    public static function encode ($buffer)
     {
         $total_length = 4 + strlen($buffer);
         return pack('N', $total_length) . $buffer;

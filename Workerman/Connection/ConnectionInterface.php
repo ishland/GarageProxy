@@ -16,18 +16,19 @@ namespace Workerman\Connection;
 /**
  * ConnectionInterface.
  */
-abstract class  ConnectionInterface
+abstract class ConnectionInterface
 {
+
     /**
      * Statistics for status command.
      *
      * @var array
      */
     public static $statistics = array(
-        'connection_count' => 0,
-        'total_request'    => 0,
-        'throw_exception'  => 0,
-        'send_fail'        => 0,
+            'connection_count' => 0,
+            'total_request' => 0,
+            'throw_exception' => 0,
+            'send_fail' => 0
     );
 
     /**
@@ -57,69 +58,70 @@ abstract class  ConnectionInterface
      * @param string $send_buffer
      * @return void|boolean
      */
-    abstract public function send($send_buffer);
+    abstract public function send ($send_buffer);
 
     /**
      * Get remote IP.
      *
      * @return string
      */
-    abstract public function getRemoteIp();
+    abstract public function getRemoteIp ();
 
     /**
      * Get remote port.
      *
      * @return int
      */
-    abstract public function getRemotePort();
+    abstract public function getRemotePort ();
 
     /**
      * Get remote address.
      *
      * @return string
      */
-    abstract public function getRemoteAddress();
+    abstract public function getRemoteAddress ();
 
     /**
      * Get local IP.
      *
      * @return string
      */
-    abstract public function getLocalIp();
+    abstract public function getLocalIp ();
 
     /**
      * Get local port.
      *
      * @return int
      */
-    abstract public function getLocalPort();
+    abstract public function getLocalPort ();
 
     /**
      * Get local address.
      *
      * @return string
      */
-    abstract public function getLocalAddress();
+    abstract public function getLocalAddress ();
 
     /**
      * Is ipv4.
      *
      * @return bool
      */
-    abstract public function isIPv4();
+    abstract public function isIPv4 ();
 
     /**
      * Is ipv6.
      *
      * @return bool
      */
-    abstract public function isIPv6();
+    abstract public function isIPv6 ();
 
     /**
      * Close connection.
      *
-     * @param $data
+     * @param
+     *            $data
      * @return void
      */
-    abstract public function close($data = null);
+    abstract public function close ($data = null);
 }

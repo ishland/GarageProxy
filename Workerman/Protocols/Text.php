@@ -12,7 +12,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 namespace Workerman\Protocols;
-
 use Workerman\Connection\TcpConnection;
 
 /**
@@ -20,23 +19,25 @@ use Workerman\Connection\TcpConnection;
  */
 class Text
 {
+
     /**
      * Check the integrity of the package.
      *
-     * @param string        $buffer
+     * @param string $buffer
      * @param TcpConnection $connection
      * @return int
      */
-    public static function input($buffer, TcpConnection $connection)
+    public static function input ($buffer, TcpConnection $connection)
     {
         // Judge whether the package length exceeds the limit.
         if (strlen($buffer) >= $connection::$maxPackageSize) {
             $connection->close();
             return 0;
         }
-        //  Find the position of  "\n".
+        // Find the position of "\n".
         $pos = strpos($buffer, "\n");
-        // No "\n", packet length is unknown, continue to wait for the data so return 0.
+        // No "\n", packet length is unknown, continue to wait for the data so
+        // return 0.
         if ($pos === false) {
             return 0;
         }
@@ -50,7 +51,7 @@ class Text
      * @param string $buffer
      * @return string
      */
-    public static function encode($buffer)
+    public static function encode ($buffer)
     {
         // Add "\n"
         return $buffer . "\n";
@@ -62,7 +63,7 @@ class Text
      * @param string $buffer
      * @return string
      */
-    public static function decode($buffer)
+    public static function decode ($buffer)
     {
         // Remove "\n"
         return trim($buffer);
