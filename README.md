@@ -46,9 +46,6 @@ http://jenkins.ishland.site/job/GarageProxy
 Main HTTPS:
 https://jenkins-ssl.ishland.site/job/GarageProxy
 
-China HTTPS:
-https://jenkins-cn.ishland.site/job/GarageProxy
-
 ## Requirements
 - PHP 5.3 or higher
 - A POSIX compatible operating system (Linux, OSX, BSD)
