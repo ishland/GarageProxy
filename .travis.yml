@@ -5,7 +5,7 @@ php:
 os:
   - linux
 script: 
-  - php build.php build normal
+  - php build.php build cached
   - cp ./target/GarageProxyServer.phar ./test/
   - cd test
   - php GarageProxyServer.phar start -d
