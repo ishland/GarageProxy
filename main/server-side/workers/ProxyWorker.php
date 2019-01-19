@@ -8,7 +8,8 @@ class ProxyWorker
     {
         sleep(1);
         global $conn_to_master, $masterport;
-        $conn_to_master = new AsyncTcpConnection("unix://master.sock");
+        $conn_to_master = new AsyncTcpConnection(
+                "unix://" . getcwd() . "/master.sock");
         $conn_to_master->onClose = function ($connection) use ( $worker)
         {
             global $ADDRESS, $global_uid, $workerid;

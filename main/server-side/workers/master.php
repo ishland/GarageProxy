@@ -1,7 +1,7 @@
 <?php
 use Workerman\Worker;
 
-$master = new Worker("unix://master.sock");
+$master = new Worker("unix://" . getcwd() . "/master.sock");
 $master->count = 1;
 $master->name = "proxy-master";
 $master->onWorkerStart = function ($worker)
