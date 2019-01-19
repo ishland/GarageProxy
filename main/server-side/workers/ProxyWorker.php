@@ -8,8 +8,7 @@ class ProxyWorker
     {
         sleep(1);
         global $conn_to_master, $masterport;
-        $conn_to_master = new AsyncTcpConnection(
-                "tcp://127.0.0.1:" . $masterport);
+        $conn_to_master = new AsyncTcpConnection("unix://master.sock");
         $conn_to_master->onClose = function ($connection) use ( $worker)
         {
             global $ADDRESS, $global_uid, $workerid;
@@ -62,23 +61,7 @@ class ProxyWorker
                 $buffer) use ( $connection)
         {
             global $conn_to_master;
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "in",
-                                    "strlen" => strlen($buffer),
-                                    "uid" => $connection->uid
-                            )));
             $connection->send($buffer);
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "out",
-                                    "strlen" => strlen($buffer),
-                                    "uid" => $connection->uid
-                            )));
         };
         $connection_to_server->onClose = function ($connection_to_server) use ( 
         $connection)
@@ -100,31 +83,15 @@ class ProxyWorker
         {
             $connection_to_server->resumeRecv();
         };
-        
+
         $connection_to_server->connect();
-        
+
         $connection->onMessage = function ($connection, $buffer) use ( 
         $connection_to_server)
         {
             global $conn_to_master;
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "in",
-                                    "strlen" => strlen($buffer),
-                                    "uid" => $connection->uid
-                            )));
+
             $connection_to_server->send($buffer);
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "new_msg",
-                                    "handle" => "out",
-                                    "strlen" => strlen($buffer),
-                                    "uid" => $connection->uid
-                            )));
-            $connection->firstmsg = false;
         };
         $connection->onClose = function ($connection) use ( 
         $connection_to_server)

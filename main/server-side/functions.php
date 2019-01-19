@@ -54,24 +54,6 @@ function checkEverything ()
     }
 }
 
-function allocatePorts ()
-{
-    global $masterport;
-    $check = new PortChecker();
-    while (true) {
-        $masterport = rand(40000, 65535);
-        echo "[" . date('Y-m-d H:i:s') .
-                "][Main][Init][Info] Allocating port {$masterport} to master... ";
-        if ($check->check("127.0.0.1", $masterport) == 1 &&
-                $check->check("127.0.0.1", $masterport) == 0) {
-            echo "failed.\n";
-            continue;
-        }
-        echo "success.\n";
-        break;
-    }
-}
-
 function loadConfig ()
 {
     global $CONFIG;
