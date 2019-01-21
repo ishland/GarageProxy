@@ -1005,14 +1005,17 @@ class TcpConnection extends ConnectionInterface
         if ($this->_status === self::STATUS_CLOSED) {
             // Cleaning up the callback to avoid memory leaks.
             $this->onMessage = $this->onClose = $this->onError = $this->onBufferFull = $this->onBufferDrain = null;
-            error_reporting(0);
             // Remove from worker->connections.
             if ($this->worker) {
-                unset($this->worker->connections[$this->_id]);
+                @iunset($this->worker->connections[$this->_id]);
             }
-            unset(static::$connections[$this->_id]);
-            error_reporting(E_ALL);
+            @iunset(static::$connections[$this->_id]);
         }
+    }
+
+    public function iunset ($var)
+    {
+        unset($var);
     }
 
     /**
