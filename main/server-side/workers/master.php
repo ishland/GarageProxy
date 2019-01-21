@@ -33,7 +33,16 @@ $master->onMessage = function ($connection, $buffer) use ( $master)
         $connection->uid = $arr['uid'];
         $master->active_conn ++;
         echo "\r[" . date('Y-m-d H:i:s') .
-                "][Master][Info][User: {$connection->proxyid}-{$connection->workerid}-{$connection->uid}] Server bridge [/{$connection->ip}:$connection->port] connected.      \n";
+                "][Master][Info][User: {$connection->proxyid}-{$connection->workerid}-{$connection->uid}] Incoming connection [/{$connection->ip}:$connection->port] connected.      \n";
+    }
+    if ($arr['action'] == "bridge_conn") {
+        $connection->ip = $arr['ip'];
+        $connection->port = $arr['port'];
+        $connection->uid = $arr['uid'];
+        $connection->remote = $arr['remote'];
+        $master->active_conn ++;
+        echo "\r[" . date('Y-m-d H:i:s') .
+                "][Master][Info][User: {$connection->proxyid}-{$connection->workerid}-{$connection->uid}] Server bridge [/{$connection->ip}:$connection->port] -> [{$connection->remote}] connected.      \n";
     }
     if ($arr['action'] == "close_conn") {
         $connection->ip = $arr['ip'];
@@ -41,7 +50,7 @@ $master->onMessage = function ($connection, $buffer) use ( $master)
         $connection->uid = $arr['uid'];
         $master->active_conn --;
         echo "\r[" . date('Y-m-d H:i:s') .
-                "][Master][Info][User: {$connection->proxyid}-{$connection->workerid}-{$connection->uid}] Server bridge [/{$connection->ip}:$connection->port] disconnected.      \n";
+                "][Master][Info][User: {$connection->proxyid}-{$connection->workerid}-{$connection->uid}] Incoming connection [/{$connection->ip}:$connection->port] disconnected.      \n";
     }
 };
 $master->onClose = function ($connection) use ( $master)

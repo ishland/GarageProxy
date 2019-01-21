@@ -55,7 +55,9 @@ class ProxyWorker
                                 "action" => "new_conn",
                                 "ip" => $connection->getRemoteIp(),
                                 "port" => $connection->getRemotePort(),
-                                "uid" => $connection->uid
+                                "remote" => $ADDRESS,
+                                "uid" => $connection->uid,
+                                "isBridgeConnected" => false
                         )));
         $connection_to_server = new AsyncTcpConnection($ADDRESS);
         $connection_to_server->onMessage = function ($connection_to_server,
@@ -86,6 +88,16 @@ class ProxyWorker
         };
 
         $connection_to_server->connect();
+        $conn_to_master->send(
+                json_encode(
+                        Array(
+                                "action" => "bridge_conn",
+                                "ip" => $connection->getRemoteIp(),
+                                "port" => $connection->getRemotePort(),
+                                "remote" => $ADDRESS,
+                                "uid" => $connection->uid,
+                                "isBridgeConnected" => true
+                        )));
 
         $connection->onMessage = function ($connection, $buffer) use ( 
         $connection_to_server)
@@ -95,7 +107,7 @@ class ProxyWorker
             $connection_to_server->send($buffer);
         };
         $connection->onClose = function ($connection) use ( 
-        $connection_to_server)
+        $connection_to_server, $ADDRESS)
         {
             global $conn_to_master;
             $conn_to_master->send(
@@ -104,12 +116,14 @@ class ProxyWorker
                                     "action" => "close_conn",
                                     "ip" => $connection->getRemoteIp(),
                                     "port" => $connection->getRemotePort(),
-                                    "uid" => $connection->uid
+                                    "remote" => $ADDRESS,
+                                    "uid" => $connection->uid,
+                                    "isBridgeConnected" => true
                             )));
             $connection_to_server->close();
         };
         $connection->onError = function ($connection, $errcode, $errormsg) use ( 
-        $connection_to_server)
+        $connection_to_server, $ADDRESS)
         {
             global $conn_to_master;
             $conn_to_master->send(
@@ -118,7 +132,9 @@ class ProxyWorker
                                     "action" => "close_conn",
                                     "ip" => $connection->getRemoteIp(),
                                     "port" => $connection->getRemotePort(),
-                                    "uid" => $connection->uid
+                                    "remote" => $ADDRESS,
+                                    "uid" => $connection->uid,
+                                    "isBridgeConnected" => true
                             )));
             $connection_to_server->close();
         };
@@ -132,45 +148,5 @@ class ProxyWorker
         {
             $connection->resumeRecv();
         };
-    }
-
-    public function onConnectMode2 ($connection)
-    {
-        global $workerid, $ADDRESS, $global_uid;
-        global $$workerid;
-        $connection->uid = ++ $global_uid;
-        $connection->worker = $$workerid->id;
-        $connection->proxyid = $$workerid->proxyid;
-        $conn_to_master->send(
-                json_encode(
-                        Array(
-                                "action" => "new_conn",
-                                "ip" => $connection->getRemoteIp(),
-                                "port" => $connection->getRemotePort(),
-                                "uid" => $connection->uid
-                        )));
-        $connection_to_server = new AsyncTcpConnection($ADDRESS);
-        $connection->pipe($connection_to_server);
-        $connection_to_server->pipe($connection);
-        $connection->onClose = function ($connection) use ( 
-        $connection_to_server)
-        {
-            global $conn_to_master;
-            $conn_to_master->send(
-                    json_encode(
-                            Array(
-                                    "action" => "close_conn",
-                                    "ip" => $connection->getRemoteIp(),
-                                    "port" => $connection->getRemotePort(),
-                                    "uid" => $connection->uid
-                            )));
-            $connection_to_server->close();
-        };
-        $connection_to_server->onClose = function ($connection_to_server) use ( 
-        $connection)
-        {
-            $connection->close();
-        };
-        $connection_to_80->connect();
     }
 }
