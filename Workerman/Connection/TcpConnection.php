@@ -1007,9 +1007,9 @@ class TcpConnection extends ConnectionInterface
             $this->onMessage = $this->onClose = $this->onError = $this->onBufferFull = $this->onBufferDrain = null;
             // Remove from worker->connections.
             if ($this->worker) {
-                @iunset($this->worker->connections[$this->_id]);
+                @self::iunset($this->worker->connections[$this->_id]);
             }
-            @iunset(static::$connections[$this->_id]);
+            @self::iunset(static::$connections[$this->_id]);
         }
     }
 
